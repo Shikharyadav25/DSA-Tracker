@@ -1,0 +1,16 @@
+{
+  "name": "dsa-tracker-server",
+  "version": "1.0.0",
+  "description": "Backend for DSA tracker with Firebase and Gemini support",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.3",
+    "dotenv": "^16.4.1",
+    "express": "^4.21.2"
+  }
+}
