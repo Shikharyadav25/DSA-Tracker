@@ -38,8 +38,23 @@ declare global {
     rate: (q: any, grade: any) => void;
     seedStarter: () => void;
     state: any;
+    toggleTheme: () => void;
   }
 }
+
+// Theme management
+window.toggleTheme = () => {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+};
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+  document.body.classList.toggle('dark-mode', isDark);
+}
+initTheme();
 
 // Global exposes
 window.switchAuthTab = (mode) => {

@@ -1,18 +1,35 @@
 :root {
-  --paper: #F6F1E4;
-  --card: #FFFDF7;
-  --ink: #262220;
-  --ink-soft: #5B554C;
-  --ink-faint: #9A927F;
-  --line: #DED5BC;
-  --moss: #3F6E52;
-  --moss-dark: #2A4A38;
-  --moss-tint: #E4EEE5;
-  --amber: #C98A2E;
-  --amber-tint: #FBEEDA;
-  --brick: #A3432D;
-  --brick-tint: #F6E4DD;
-  --shadow: 0 1px 0 rgba(38,34,32,0.06);
+  --paper: #FAF9F6;
+  --card: #FFFFFF;
+  --ink: #1C1917;
+  --ink-soft: #57534E;
+  --ink-faint: #A8A29E;
+  --line: #E7E5E4;
+  --moss: #BE123C;
+  --moss-dark: #881337;
+  --moss-tint: #FFE4E6;
+  --amber: #D97706;
+  --amber-tint: #FEF3C7;
+  --brick: #9F1239;
+  --brick-tint: #FFE4E6;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+body.dark-mode {
+  --paper: #080A10;
+  --card: #0F1320;
+  --ink: #F4F4F5;
+  --ink-soft: #A1A1AA;
+  --ink-faint: #52525B;
+  --line: #1E2330;
+  --moss: #E11D48;
+  --moss-dark: #BE123C;
+  --moss-tint: #4C0519;
+  --amber: #FBBF24;
+  --amber-tint: #451A03;
+  --brick: #E11D48;
+  --brick-tint: #4C0519;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 * { box-sizing: border-box; }
@@ -22,7 +39,23 @@ body {
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   line-height: 1.5;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
+
+body.dark-mode {
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(225, 29, 72, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.03) 0%, transparent 40%),
+    radial-gradient(1px 1px at 80px 120px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 280px 80px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 150px 300px, rgba(255,255,255,0.5), rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 450px 180px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 620px 280px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 800px 150px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 950px 350px, rgba(255,255,255,0.4), rgba(0,0,0,0));
+  background-attachment: fixed;
+}
+
 .voice { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
 .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 24px 80px; }
 
