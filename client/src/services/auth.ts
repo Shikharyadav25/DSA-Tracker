@@ -17,6 +17,7 @@ export interface AppUser extends User {
 
 export let currentUser: AppUser | null = null;
 export let authMode: 'login' | 'signup' = 'login';
+let authObserverCallback: ((user: AppUser | null) => void) | null = null;
 
 export function setAuthMode(mode: 'login' | 'signup') {
   authMode = mode;
@@ -36,6 +37,9 @@ export async function loginAsGuest(): Promise<void> {
   };
   setCurrentUid('guest');
   window.localStorage.setItem(USER_KEY, JSON.stringify(currentUser));
+  if (authObserverCallback) {
+    authObserverCallback(currentUser);
+  }
 }
 
 export async function loginWithGoogle(): Promise<{ success: boolean; error?: string }> {
@@ -79,11 +83,15 @@ export async function logout(): Promise<void> {
   window.localStorage.removeItem(USER_KEY);
   currentUser = null;
   setCurrentUid('guest');
+  if (authObserverCallback) {
+    authObserverCallback(null);
+  }
   await firebaseSignOut(auth);
 }
 
 // Observe state changes and run the callback with the active user context.
 export function registerAuthObserver(callback: (user: AppUser | null) => void) {
+  authObserverCallback = callback;
   // Check if there is an active guest session in localStorage on boot
   const guestUserVal = window.localStorage.getItem(USER_KEY);
   if (guestUserVal) {
