@@ -4,12 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Box — DSA Revision Tracker</title>
+  <!-- Google Fonts - Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 </head>
 <body>
 
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="login-screen">
-  <div class="login-card">
+  <div class="login-card animate__animated animate__fadeIn">
     <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme" style="position: absolute; top: 16px; right: 16px;">
       <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="4"></circle>
@@ -22,13 +28,13 @@
     <div class="login-brand">
       <div class="brand-mark">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="3" y="5" width="18" height="14" rx="2" stroke="#fff" stroke-width="1.6"/>
-          <line x1="3" y1="10" x2="21" y2="10" stroke="#fff" stroke-width="1.6"/>
-          <line x1="8" y1="5" x2="8" y2="10" stroke="#fff" stroke-width="1.6"/>
+          <rect x="3" y="5" width="18" height="14" rx="2" stroke="#000" stroke-width="2"/>
+          <line x1="3" y1="10" x2="21" y2="10" stroke="#000" stroke-width="2"/>
+          <line x1="8" y1="5" x2="8" y2="10" stroke="#000" stroke-width="2"/>
         </svg>
       </div>
-      <h1 class="voice">The Box</h1>
-      <p>Sign in to keep your revision schedule</p>
+      <h2 class="voice">SIGN IN</h2>
+      <p>Keep your revision schedule on track</p>
     </div>
 
     <div class="auth-toggle">

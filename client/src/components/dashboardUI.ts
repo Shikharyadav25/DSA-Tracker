@@ -162,7 +162,7 @@ export function renderRevise() {
   const q = due[0];
   const daysOverdue = Math.max(0, Math.floor((now - q.nextReview!)/dayMs(1)));
   body.innerHTML = `
-    <div class="rev-card">
+    <div class="rev-card animate__animated animate__fadeIn">
       <span class="box-badge">Box ${q.box}</span>
       <h3>${escapeHtml(q.title)}</h3>
       <div class="meta-row" style="justify-content:center;">
@@ -170,8 +170,8 @@ export function renderRevise() {
         <span class="tag plain">${escapeHtml(q.topic)}</span>
         ${q.pattern?`<span class="tag plain">${escapeHtml(q.pattern)}</span>`:``}
       </div>
-      <p class="due-note">${daysOverdue>0? daysOverdue+' day(s) overdue' : 'Due today'} · reviewed ${q.reviewCount||0} time(s)${q.link?` · <a href="${q.link}" target="_blank" rel="noopener" style="color:var(--moss-dark);">open problem</a>`:``}</p>
-      <p style="font-size:12.5px;color:var(--ink-soft);">Try to solve it again from memory first. Then rate how it went.</p>
+      <p class="due-note">${daysOverdue>0? daysOverdue+' day(s) overdue' : 'Due today'} · reviewed ${q.reviewCount||0} time(s)${q.link?` · <a href="${q.link}" target="_blank" rel="noopener" style="color:var(--nb-red);font-weight:800;">open problem</a>`:``}</p>
+      <p style="font-size:13px;color:var(--ink-soft);font-weight:600;">Try to solve it again from memory first. Then rate how it went.</p>
       <div class="rate-row">
         <button class="rate-btn again" onclick="rate(state.questions.find(x=>x.id==='${q.id}'),'again')">Again<small>couldn't recall</small></button>
         <button class="rate-btn hard" onclick="rate(state.questions.find(x=>x.id==='${q.id}'),'hard')">Hard<small>slow, shaky</small></button>
@@ -179,7 +179,7 @@ export function renderRevise() {
         <button class="rate-btn easy" onclick="rate(state.questions.find(x=>x.id==='${q.id}'),'easy')">Easy<small>instant</small></button>
       </div>
     </div>
-    <p style="text-align:center;color:var(--ink-faint);font-size:12.5px;">${due.length-1} more waiting after this one</p>
+    <p style="text-align:center;color:var(--ink-soft);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">${due.length-1} more waiting after this one</p>
   `;
 }
 
@@ -208,8 +208,8 @@ export function renderQuestions() {
     <div class="qcard">
       <div class="qcard-top">
         <div>
-          <h3>${q.link?`<a href="${q.link}" target="_blank" rel="noopener">${escapeHtml(q.title)}</a>`:`${escapeHtml(q.title)}`}</h3>
-          <div style="font-size:12px;color:var(--ink-faint);">${escapeHtml(q.platform)}${q.nextReview?` · next review ${new Date(q.nextReview).toLocaleDateString()}`:``}</div>
+          <h3>${escapeHtml(q.title)}</h3>
+          <div style="font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-top:4px;">${escapeHtml(q.platform)}${q.nextReview?` · next review ${new Date(q.nextReview).toLocaleDateString()}`:``}</div>
         </div>
         <div class="qcard-actions">
           <button class="icon-btn" title="Edit" onclick="openModal('${q.id}')">✎</button>
@@ -228,6 +228,7 @@ export function renderQuestions() {
           ${['New','Reading','Attempting','Hint used','Solved'].map(s=>`<option ${q.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
+      ${q.link?`<div><a href="${q.link}" target="_blank" rel="noopener" class="problem-link">view problem ↗</a></div>`:``}
     </div>
   `).join('');
 }

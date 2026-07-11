@@ -56,6 +56,45 @@ function initTheme() {
 }
 initTheme();
 
+// Navbar Scroll Listener
+function initScrollListener() {
+  const handleScroll = () => {
+    const header = document.querySelector('header.top');
+    if (header) {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    }
+  };
+  window.addEventListener('scroll', handleScroll);
+  handleScroll();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initScrollListener);
+} else {
+  initScrollListener();
+}
+
+// Scroll animation trigger using IntersectionObserver
+export function triggerScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.panel, .stat-card, .qcard, .box-tile').forEach(el => {
+    if (!el.classList.contains('animate__animated')) {
+      observer.observe(el);
+    }
+  });
+}
+
 // Global exposes
 window.switchAuthTab = (mode) => {
   authTab(mode);
@@ -137,6 +176,7 @@ export function renderAll() {
   renderBoxes();
   renderRevise();
   renderQuestions();
+  setTimeout(triggerScrollAnimations, 50);
 }
 
 async function showApp() {
@@ -153,6 +193,7 @@ async function showApp() {
   await loadSheets();
   renderSheets();
   renderAll();
+  setTimeout(triggerScrollAnimations, 100);
 }
 
 // Navigation Tabs
@@ -163,6 +204,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
     document.querySelectorAll('section.view').forEach(v => v.classList.remove('active'));
     target.classList.add('active');
     document.getElementById('view-' + target.dataset.view!)?.classList.add('active');
+    setTimeout(triggerScrollAnimations, 50);
   });
 });
 

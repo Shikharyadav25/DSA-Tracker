@@ -45,19 +45,23 @@ export function getSheetsKey() {
 
 export const USER_KEY = 'dsa-tracker-user-v1';
 
-export let state: AppState = { questions: [], activityLog: {} };
-export let sheetsData: SheetsData = { progress: {}, hidden: {}, custom: {} };
+export const state: AppState = { questions: [], activityLog: {} };
+export const sheetsData: SheetsData = { progress: {}, hidden: {}, custom: {} };
 
 export async function loadState(): Promise<void> {
   try {
     const res = await window.storage.get(getStoreKey());
     if (res && res.value) {
-      state = JSON.parse(res.value);
+      const parsed = JSON.parse(res.value);
+      state.questions = parsed.questions || [];
+      state.activityLog = parsed.activityLog || {};
     } else {
-      state = { questions: [], activityLog: {} };
+      state.questions = [];
+      state.activityLog = {};
     }
   } catch (e) {
-    state = { questions: [], activityLog: {} };
+    state.questions = [];
+    state.activityLog = {};
   }
 }
 
@@ -73,16 +77,20 @@ export async function loadSheets(): Promise<void> {
   try {
     const res = await window.storage.get(getSheetsKey());
     if (res && res.value) {
-      sheetsData = JSON.parse(res.value);
+      const parsed = JSON.parse(res.value);
+      sheetsData.progress = parsed.progress || {};
+      sheetsData.hidden = parsed.hidden || {};
+      sheetsData.custom = parsed.custom || {};
     } else {
-      sheetsData = { progress: {}, hidden: {}, custom: {} };
+      sheetsData.progress = {};
+      sheetsData.hidden = {};
+      sheetsData.custom = {};
     }
   } catch (e) {
-    sheetsData = { progress: {}, hidden: {}, custom: {} };
+    sheetsData.progress = {};
+    sheetsData.hidden = {};
+    sheetsData.custom = {};
   }
-  sheetsData.progress = sheetsData.progress || {};
-  sheetsData.hidden = sheetsData.hidden || {};
-  sheetsData.custom = sheetsData.custom || {};
 }
 
 export async function saveSheets(): Promise<void> {
