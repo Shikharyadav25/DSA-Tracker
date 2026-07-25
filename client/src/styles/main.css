@@ -99,6 +99,22 @@ body {
 }
 
 /* =========================================================
+   AUTH TOGGLE SPECIFIC TAB CONTRAST RULES
+   ========================================================= */
+
+body.dark-mode .auth-toggle button.bg-accent-primary,
+.auth-toggle button.bg-accent-primary {
+  background-color: #4A9FD8 !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .auth-toggle button:not(.bg-accent-primary),
+.auth-toggle button:not(.bg-accent-primary) {
+  background-color: #FFFFFF !important;
+  color: #141414 !important;
+}
+
+/* =========================================================
    DARK MODE EXPLICIT CONTRAST RULES
    ========================================================= */
 

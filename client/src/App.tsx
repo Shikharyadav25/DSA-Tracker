@@ -379,13 +379,15 @@ export default function App() {
 
           <div className="auth-toggle w-full flex border-3 border-border mb-6 overflow-hidden">
             <button
-              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer ${authTab === 'login' ? 'bg-accent-primary text-white' : 'bg-bg-surface text-text-primary'}`}
+              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer ${authTab === 'login' ? 'bg-accent-primary' : 'bg-white'}`}
+              style={{ color: authTab === 'login' ? '#FFFFFF' : '#141414', backgroundColor: authTab === 'login' ? '#4A9FD8' : '#FFFFFF' }}
               onClick={() => setAuthTab('login')}
             >
               Sign In
             </button>
             <button
-              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer border-l-3 border-border ${authTab === 'signup' ? 'bg-accent-primary text-white' : 'bg-bg-surface text-text-primary'}`}
+              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer border-l-3 border-border ${authTab === 'signup' ? 'bg-accent-primary' : 'bg-white'}`}
+              style={{ color: authTab === 'signup' ? '#FFFFFF' : '#141414', backgroundColor: authTab === 'signup' ? '#4A9FD8' : '#FFFFFF' }}
               onClick={() => setAuthTab('signup')}
             >
               Sign Up
