@@ -274,7 +274,7 @@ function generateWeeklyPlanSchedule(userId, preferences, tracks, topics, subtopi
     weekStartDate: weeklyPlanId,
     userId,
     status: 'Active',
-    targetHours,
+    targetHours: preferences?.targetWeeklyHours || 15,
     focusArea: 'Personalized SDE Curriculum',
     dailyPlans
   };
