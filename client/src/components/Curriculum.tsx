@@ -126,7 +126,7 @@ export default function Curriculum({
             key={t.id}
             onClick={() => setActiveTrack(t.id)}
             className={`brutal-btn py-2 px-5 text-xs font-black uppercase flex items-center gap-2 ${
-              activeTrack === t.id ? 'bg-accent-blue text-text-primary' : 'bg-bg-surface text-text-primary'
+              activeTrack === t.id ? 'bg-accent-blue text-black' : 'bg-bg-surface text-black dark:text-white'
             }`}
           >
             {getTrackIcon(t.id)}
@@ -140,7 +140,7 @@ export default function Curriculum({
         <div className="md:col-span-4 flex flex-col gap-6">
           <div className="brutal-card p-5 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
             <div className="absolute top-0 right-0 w-6 h-6 bg-accent-pink border-l-3 border-b-3 border-border"></div>
-            <h3 className="brutal-title text-sm font-black mb-4 text-text-primary">SYLLABUS TOPICS</h3>
+            <h3 className="brutal-title text-sm font-black mb-4 text-black dark:text-white">SYLLABUS TOPICS</h3>
 
             <div className="flex flex-col gap-2">
               {filteredTopics.map(topic => (
@@ -148,19 +148,22 @@ export default function Curriculum({
                   key={topic.id}
                   onClick={() => setActiveTopic(topic.id)}
                   className={`w-full text-left p-3 border-2 border-border brutal-title text-xs font-black transition-all cursor-pointer ${
-                    activeTopic === topic.id ? 'bg-accent-pink text-text-primary' : 'bg-bg-surface text-text-primary hover:translate-x-0.5'
+                    activeTopic === topic.id 
+                      ? 'topic-btn-selected shadow-[2px_2px_0px_var(--shadow-color)]' 
+                      : 'topic-btn-unselected hover:translate-x-0.5'
                   }`}
+                  style={{ color: '#000000' }}
                 >
-                  {topic.name}
+                  <span className="font-extrabold uppercase tracking-tight" style={{ color: '#000000' }}>{topic.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {activeTopic && (
+          {activeTopic && filteredSubtopics.length > 1 && (
             <div className="brutal-card p-5 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
               <div className="absolute top-0 right-0 w-6 h-6 bg-accent-blue border-l-3 border-b-3 border-border"></div>
-              <h3 className="brutal-title text-sm font-black mb-4 text-text-primary">SUBTOPICS</h3>
+              <h3 className="brutal-title text-sm font-black mb-4 text-black dark:text-white">PATTERN SUBTOPICS</h3>
 
               <div className="flex flex-col gap-2">
                 {filteredSubtopics.map(sub => (
@@ -168,10 +171,13 @@ export default function Curriculum({
                     key={sub.id}
                     onClick={() => setActiveSubtopic(sub.id)}
                     className={`w-full text-left p-2.5 border-2 border-border brutal-title text-xs font-black transition-all cursor-pointer ${
-                      activeSubtopic === sub.id ? 'bg-accent-blue text-text-primary' : 'bg-bg-surface text-text-primary hover:translate-x-0.5'
+                      activeSubtopic === sub.id 
+                        ? 'subtopic-btn-selected shadow-[2px_2px_0px_var(--shadow-color)]' 
+                        : 'subtopic-btn-unselected hover:translate-x-0.5'
                     }`}
+                    style={{ color: '#000000' }}
                   >
-                    {sub.name}
+                    <span className="font-extrabold uppercase tracking-tight" style={{ color: '#000000' }}>{sub.name}</span>
                   </button>
                 ))}
               </div>
@@ -189,14 +195,19 @@ export default function Curriculum({
                 <div>
                   <h2 className="brutal-title text-xl font-black m-0 leading-none text-text-primary">{currentSubtopic.name}</h2>
                   <span className="brutal-mono text-xs text-text-secondary block mt-2">
-                    Subtopic score: {subtopicMastery}%
+                    Subtopic score: {subtopicMastery}% | Logged questions: {subtopicProblems.length}
                   </span>
                 </div>
                 <button
-                  className="brutal-btn py-1.5 px-4 text-xs bg-accent-green text-text-primary font-bold border-2 border-border"
-                  onClick={() => setShowAddForm(!showAddForm)}
+                  className="brutal-btn py-2 px-4 text-xs bg-accent-green text-text-primary font-extrabold border-2 border-border shadow-[3px_3px_0px_var(--shadow-color)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                  onClick={() => {
+                    if (!showAddForm && !newPattern) {
+                      setNewPattern(currentSubtopic.name);
+                    }
+                    setShowAddForm(!showAddForm);
+                  }}
                 >
-                  {showAddForm ? 'CANCEL' : '+ ADD QUESTION'}
+                  {showAddForm ? '✕ CANCEL' : '+ ADD QUESTION MANUALLY'}
                 </button>
               </div>
 
@@ -225,12 +236,15 @@ export default function Curriculum({
 
               {/* Add form */}
               {showAddForm && (
-                <form onSubmit={handleSubmitProblem} className="border-3 border-border p-5 bg-bg-surface-alt mb-6 flex flex-col gap-4">
-                  <h4 className="brutal-title text-sm font-black m-0 text-text-primary">Log question under {currentSubtopic.name}</h4>
+                <form onSubmit={handleSubmitProblem} className="border-3 border-border p-5 bg-bg-surface-alt mb-6 flex flex-col gap-4 shadow-[4px_4px_0px_var(--shadow-color)]">
+                  <div className="flex justify-between items-center border-b-2 border-border pb-2">
+                    <h4 className="brutal-title text-sm font-black m-0 text-text-primary">➕ Add Question to {currentSubtopic.name}</h4>
+                    <span className="brutal-mono text-[10px] uppercase font-bold text-accent-primary">Manual Entry</span>
+                  </div>
                   
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-extrabold uppercase text-text-primary">Title</label>
-                    <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Find duplicates in O(N)" className="brutal-input text-xs" required />
+                    <label className="text-[10px] font-extrabold uppercase text-text-primary">Question Title *</label>
+                    <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. 3Sum / Subarray Sum Equals K" className="brutal-input text-xs" required />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -241,6 +255,7 @@ export default function Curriculum({
                         <option>Codeforces</option>
                         <option>CodeChef</option>
                         <option>GFG</option>
+                        <option>InterviewBit</option>
                         <option>Custom</option>
                       </select>
                     </div>
@@ -260,26 +275,36 @@ export default function Curriculum({
                       <input type="number" min="5" value={newEstTime} onChange={e => setNewEstTime(e.target.value)} className="brutal-input text-xs" required />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-extrabold uppercase text-text-primary">Pattern</label>
-                      <input type="text" value={newPattern} onChange={e => setNewPattern(e.target.value)} placeholder="e.g. sliding window" className="brutal-input text-xs" />
+                      <label className="text-[10px] font-extrabold uppercase text-text-primary">Pattern Tag</label>
+                      <input type="text" value={newPattern} onChange={e => setNewPattern(e.target.value)} placeholder="e.g. Pattern: Two Pointers" className="brutal-input text-xs" />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-extrabold uppercase text-text-primary">URL</label>
+                    <label className="text-[10px] font-extrabold uppercase text-text-primary">Problem URL / Link</label>
                     <input type="url" value={newLink} onChange={e => setNewLink(e.target.value)} placeholder="https://leetcode.com/problems/..." className="brutal-input text-xs" />
                   </div>
 
-                  <button type="submit" className="brutal-btn brutal-btn-primary py-3 text-xs font-black">
-                    SAVE PROBLEM
+                  <button type="submit" className="brutal-btn brutal-btn-primary py-3 text-xs font-black uppercase">
+                    💾 Save Question to Syllabus
                   </button>
                 </form>
               )}
 
               {/* Problems Stack list */}
               {subtopicProblems.length === 0 ? (
-                <div className="text-center brutal-mono text-xs text-text-secondary p-10 border-3 border-dashed border-border bg-bg-surface-alt">
-                  No active problems logged under this track topic section. Add one above.
+                <div className="text-center brutal-mono text-xs text-text-secondary p-10 border-3 border-dashed border-border bg-bg-surface-alt flex flex-col items-center gap-3">
+                  <span>No active problems logged under this section yet.</span>
+                  <button
+                    type="button"
+                    className="brutal-btn py-2 px-5 text-xs bg-accent-green text-text-primary font-black border-2 border-border shadow-[2px_2px_0px_var(--shadow-color)]"
+                    onClick={() => {
+                      if (!newPattern) setNewPattern(currentSubtopic.name);
+                      setShowAddForm(true);
+                    }}
+                  >
+                    + ADD QUESTION MANUALLY
+                  </button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">

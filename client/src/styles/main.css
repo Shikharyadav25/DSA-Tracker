@@ -398,3 +398,40 @@ body.dark-mode .brutal-grid-paper {
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px var(--shadow-color);
 }
+
+/* Explicit Topic & Subtopic Button Contrast Rules */
+.topic-btn-unselected,
+.subtopic-btn-unselected {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+body.dark-mode .topic-btn-unselected,
+body.dark-mode .subtopic-btn-unselected,
+body.dark-mode .topic-btn-unselected *,
+body.dark-mode .subtopic-btn-unselected * {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.topic-btn-selected {
+  background-color: #F28FA3 !important;
+  color: #000000 !important;
+}
+
+body.dark-mode .topic-btn-selected,
+body.dark-mode .topic-btn-selected * {
+  background-color: #F28FA3 !important;
+  color: #000000 !important;
+}
+
+.subtopic-btn-selected {
+  background-color: #4A9FD8 !important;
+  color: #000000 !important;
+}
+
+body.dark-mode .subtopic-btn-selected,
+body.dark-mode .subtopic-btn-selected * {
+  background-color: #4A9FD8 !important;
+  color: #000000 !important;
+}
