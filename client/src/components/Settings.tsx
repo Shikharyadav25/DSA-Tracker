@@ -3,70 +3,35 @@ import { UserPreference } from '../types/learningOS';
 
 interface SettingsProps {
   preferences: UserPreference | null;
-  savePrefs: (newPrefs: UserPreference) => Promise<void>;
-  triggerReset: () => Promise<void>;
+  savePreferences: (pref: UserPreference) => Promise<void>;
+  reseedMockData: () => Promise<void>;
+  theme?: 'light' | 'dark';
+  toggleTheme?: () => void;
 }
 
 export default function Settings({
   preferences,
-  savePrefs,
-  triggerReset
+  savePreferences,
+  reseedMockData,
+  theme,
+  toggleTheme
 }: SettingsProps) {
-  const [hours, setHours] = useState(preferences?.targetWeeklyHours.toString() || '15');
-  const [intensity, setIntensity] = useState<'chill' | 'balanced' | 'hardcore'>(preferences?.intensity || 'balanced');
-  const [workload, setWorkload] = useState<'Low' | 'Medium' | 'High'>(preferences?.collegeWorkload || 'Low');
+  const [hours, setHours] = useState(preferences?.targetHoursPerWeek?.toString() || '15');
+  const [intensity, setIntensity] = useState(preferences?.dailyIntensity || 'balanced');
+  const [workload, setWorkload] = useState(preferences?.collegeWorkload || 'Low');
+  const [wakeTime, setWakeTime] = useState(preferences?.wakeTime || '07:00');
   const [activeTracks, setActiveTracks] = useState<string[]>(preferences?.activeTracks || ['dsa', 'backend', 'projects']);
-  const [studyDays, setStudyDays] = useState<number[]>(preferences?.studyDays || [1, 2, 3, 4, 5, 6, 0]);
-  const [wakeTime, setWakeTime] = useState(preferences?.wakeTime || '08:00');
+  const [studyDays, setStudyDays] = useState<number[]>(preferences?.studyDays || [1, 2, 3, 4, 5, 6]);
 
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  const handleTrackToggle = (id: string) => {
-    if (activeTracks.includes(id)) {
-      setActiveTracks(activeTracks.filter(x => x !== id));
-    } else {
-      setActiveTracks([...activeTracks, id]);
-    }
-  };
-
-  const handleDayToggle = (day: number) => {
-    if (studyDays.includes(day)) {
-      setStudyDays(studyDays.filter(d => d !== day));
-    } else {
-      setStudyDays([...studyDays, day].sort());
-    }
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!preferences) return;
-    setSaving(true);
-    setMsg(null);
-
-    const updated: UserPreference = {
-      ...preferences,
-      targetWeeklyHours: parseInt(hours) || 15,
-      intensity,
-      collegeWorkload: workload,
-      activeTracks,
-      studyDays,
-      wakeTime
-    };
-
-    await savePrefs(updated);
-    setSaving(false);
-    setMsg('✓ PREFERENCES UPDATED. AUTOPILOT COORDINATES.');
-    setTimeout(() => setMsg(null), 4000);
-  };
+  const [reseeding, setReseeding] = useState(false);
+  const [msg, setMsg] = useState('');
 
   const trackLabels = [
     { id: 'dsa', label: 'Data Structures & Algorithms' },
-    { id: 'backend', label: 'Backend Engineering Tracks' },
+    { id: 'backend', label: 'Backend Engineering' },
     { id: 'projects', label: 'Capstone Projects' },
-    { id: 'aptitude', label: 'Quantitative Aptitude' },
-    { id: 'core_cs', label: 'Core CS (OS, DBMS, CN)' },
-    { id: 'resume', label: 'Branding & Resume tailoring' }
+    { id: 'aptitude', label: 'Aptitude & Logical Reasoning' },
+    { id: 'core_cs', label: 'CS Core Fundamentals (OS/DBMS/CN)' }
   ];
 
   const weekDays = [
@@ -79,30 +44,93 @@ export default function Settings({
     { num: 0, label: 'Sun' }
   ];
 
-  return (
-    <div className="flex flex-col gap-6 animate__animated animate__fadeIn max-w-[600px] mx-auto">
-      <div className="brutal-card p-8 border-3 border-ink shadow-[6px_6px_0px_var(--ink)] bg-bg-white relative">
-        <div className="absolute top-0 right-0 w-8 h-8 bg-accent-blue border-l-3 border-b-3 border-ink"></div>
+  const handleTrackToggle = (id: string) => {
+    if (activeTracks.includes(id)) {
+      setActiveTracks(activeTracks.filter(t => t !== id));
+    } else {
+      setActiveTracks([...activeTracks, id]);
+    }
+  };
 
-        <h2 className="brutal-title text-xl font-black mb-1">SETTINGS & PARAMETERS</h2>
-        <p className="brutal-mono text-xs text-muted mb-6">
+  const handleDayToggle = (dayNum: number) => {
+    if (studyDays.includes(dayNum)) {
+      setStudyDays(studyDays.filter(d => d !== dayNum));
+    } else {
+      setStudyDays([...studyDays, dayNum]);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedPref: UserPreference = {
+      userId: preferences?.userId || 'u-1',
+      targetHoursPerWeek: parseInt(hours) || 15,
+      dailyIntensity: intensity,
+      collegeWorkload: workload,
+      wakeTime,
+      sleepTime: preferences?.sleepTime || '23:00',
+      activeTracks,
+      studyDays
+    };
+
+    await savePreferences(updatedPref);
+    setMsg('SETTINGS SAVED SUCCESSFULLY ✓');
+    setTimeout(() => setMsg(''), 3000);
+  };
+
+  const handleReseed = async () => {
+    if (!window.confirm('Reset local database with default sample syllabus data?')) return;
+    setReseeding(true);
+    await reseedMockData();
+    setReseeding(false);
+    setMsg('DATABASE RE-SEEDED ✓');
+    setTimeout(() => setMsg(''), 3000);
+  };
+
+  return (
+    <div className="flex flex-col gap-6 animate__animated animate__fadeIn max-w-[800px] mx-auto">
+      <div className="brutal-card p-8 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
+        <div className="absolute top-0 right-0 w-8 h-8 bg-accent-blue border-l-3 border-b-3 border-border"></div>
+
+        <h2 className="brutal-title text-xl font-black mb-1 text-text-primary">SETTINGS & PARAMETERS</h2>
+        <p className="brutal-mono text-xs text-text-secondary mb-6">
           Configure active tracks, capacity constraints, and database resets.
         </p>
 
         {msg && (
-          <div className="border-2 border-ink p-3 bg-status-success font-bold text-xs mb-4 uppercase">
+          <div className="border-2 border-border p-3 bg-status-success text-text-primary font-bold text-xs mb-4 uppercase">
             {msg}
           </div>
         )}
 
         <form onSubmit={handleSave} className="flex flex-col gap-4">
+          {toggleTheme && (
+            <div className="flex flex-col gap-1 mb-2">
+              <label className="text-[10px] font-extrabold uppercase text-text-primary">App Theme</label>
+              <div className="flex items-center justify-between border-3 border-border p-4 bg-bg-surface-alt shadow-[3px_3px_0px_var(--shadow-color)]">
+                <div>
+                  <div className="font-extrabold text-xs uppercase brutal-title flex items-center gap-2 text-text-primary">
+                    Current Mode: {theme === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}
+                  </div>
+                  <div className="brutal-mono text-[10px] text-text-secondary">Toggle application visual color theme</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="brutal-btn py-2 px-4 text-xs font-black flex items-center gap-2"
+                >
+                  {theme === 'dark' ? '☀️ Switch to Light' : '🌙 Switch to Dark'}
+                </button>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-extrabold uppercase">Target Hours/Week</label>
+              <label className="text-[10px] font-extrabold uppercase text-text-primary">Target Hours/Week</label>
               <input type="number" min="1" max="100" value={hours} onChange={e => setHours(e.target.value)} className="brutal-input text-xs" required />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-extrabold uppercase">Daily intensity</label>
+              <label className="text-[10px] font-extrabold uppercase text-text-primary">Daily intensity</label>
               <select value={intensity} onChange={e => setIntensity(e.target.value as any)} className="brutal-select text-xs">
                 <option value="chill">Chill (Max 2 tasks)</option>
                 <option value="balanced">Balanced (Max 3 tasks)</option>
@@ -113,7 +141,7 @@ export default function Settings({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-extrabold uppercase">College Workload Capacity</label>
+              <label className="text-[10px] font-extrabold uppercase text-text-primary">College Workload Capacity</label>
               <select value={workload} onChange={e => setWorkload(e.target.value as any)} className="brutal-select text-xs">
                 <option value="Low">Low (No adjustments)</option>
                 <option value="Medium">Medium (Slight reduction)</option>
@@ -121,18 +149,18 @@ export default function Settings({
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-extrabold uppercase">Wake Time</label>
+              <label className="text-[10px] font-extrabold uppercase text-text-primary">Wake Time</label>
               <input type="time" value={wakeTime} onChange={e => setWakeTime(e.target.value)} className="brutal-input text-xs" required />
             </div>
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
-            <label className="text-[10px] font-extrabold uppercase">Active Study Syllabus Tracks</label>
-            <div className="grid grid-cols-1 gap-2 border-2 border-ink p-4 bg-bg-light">
+            <label className="text-[10px] font-extrabold uppercase text-text-primary">Active Study Syllabus Tracks</label>
+            <div className="grid grid-cols-1 gap-2 border-2 border-border p-4 bg-bg-surface-alt">
               {trackLabels.map(t => {
                 const isActive = activeTracks.includes(t.id);
                 return (
-                  <label key={t.id} className="flex items-center gap-3 cursor-pointer text-xs font-bold uppercase m-0">
+                  <label key={t.id} className="flex items-center gap-3 cursor-pointer text-xs font-bold uppercase m-0 text-text-primary">
                     <input type="checkbox" checked={isActive} onChange={() => handleTrackToggle(t.id)} className="w-4 h-4 cursor-pointer" />
                     {t.label}
                   </label>
@@ -142,7 +170,7 @@ export default function Settings({
           </div>
 
           <div className="flex flex-col gap-1.5 mt-2">
-            <label className="text-[10px] font-extrabold uppercase">Syllabus Study Days</label>
+            <label className="text-[10px] font-extrabold uppercase text-text-primary">Syllabus Study Days</label>
             <div className="flex gap-2 flex-wrap">
               {weekDays.map(d => {
                 const isSel = studyDays.includes(d.num);
@@ -151,8 +179,8 @@ export default function Settings({
                     key={d.num}
                     type="button"
                     onClick={() => handleDayToggle(d.num)}
-                    className={`py-2 px-3 border-2 border-ink brutal-title text-xs font-black cursor-pointer transition-all duration-75 ${
-                      isSel ? 'bg-accent-blue text-ink shadow-[0px_0px_0px_var(--ink)] translate-x-[2px] translate-y-[2px]' : 'bg-bg-white text-ink hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_var(--ink)]'
+                    className={`py-2 px-3 border-2 border-border brutal-title text-xs font-black cursor-pointer transition-all duration-75 ${
+                      isSel ? 'bg-accent-blue text-text-primary shadow-[0px_0px_0px_var(--shadow-color)] translate-x-[2px] translate-y-[2px]' : 'bg-bg-surface text-text-primary hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_var(--shadow-color)]'
                     }`}
                   >
                     {d.label}
@@ -162,20 +190,20 @@ export default function Settings({
             </div>
           </div>
 
-          <button type="submit" className="w-full brutal-btn brutal-btn-primary py-3.5 text-xs font-black mt-3" disabled={saving}>
-            {saving ? 'SAVING...' : '✓ SAVE PREFERENCES'}
-          </button>
+          <div className="mt-4 pt-4 border-t-3 border-border flex justify-between items-center">
+            <button type="submit" className="brutal-btn brutal-btn-primary py-3 px-8 text-xs font-black">
+              SAVE CONFIGURATION
+            </button>
+            <button
+              type="button"
+              onClick={handleReseed}
+              disabled={reseeding}
+              className="brutal-btn py-3 px-6 text-xs bg-status-danger text-text-primary font-black border-3 border-border"
+            >
+              {reseeding ? 'RE-SEEDING...' : 'RE-SEED DEMO DATA'}
+            </button>
+          </div>
         </form>
-
-        <div className="border-t-3 border-ink mt-8 pt-6">
-          <h4 className="brutal-title text-sm font-black text-status-danger m-0 mb-1">FACTORY RESET</h4>
-          <p className="brutal-mono text-xs text-muted mb-4">
-            Delete all tracking logs and rebuild structural seeds.
-          </p>
-          <button className="brutal-btn border-status-danger text-status-danger py-2 px-6 text-xs font-black bg-bg-white" onClick={triggerReset}>
-            RESEED DATABASE
-          </button>
-        </div>
       </div>
     </div>
   );

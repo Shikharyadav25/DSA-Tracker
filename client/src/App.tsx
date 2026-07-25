@@ -368,40 +368,40 @@ export default function App() {
 
           <div className="w-full flex flex-col items-center mb-8 mt-4 text-center">
             {/* Square Logo Swatch */}
-            <div className="w-14 h-14 border-3 border-ink shadow-[4px_4px_0px_var(--ink)] bg-accent-pink flex items-center justify-center mb-4">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-7 h-7 text-ink">
+            <div className="w-14 h-14 border-3 border-border shadow-[4px_4px_0px_var(--shadow-color)] bg-accent-primary text-white flex items-center justify-center mb-4">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-7 h-7">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
               </svg>
             </div>
-            <h1 className="brutal-title text-3xl leading-none font-extrabold mb-1">LEARNING OS</h1>
-            <p className="brutal-mono uppercase text-xs tracking-wider">Autonomous study coordinator</p>
+            <h1 className="brutal-title text-3xl leading-none font-extrabold mb-1 text-text-primary">LEARNING OS</h1>
+            <p className="brutal-mono uppercase text-xs tracking-wider text-text-secondary">Autonomous study coordinator</p>
           </div>
 
-          <div className="auth-toggle w-full flex border-3 border-ink mb-6 overflow-hidden">
+          <div className="auth-toggle w-full flex border-3 border-border mb-6 overflow-hidden">
             <button
-              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer ${authTab === 'login' ? 'bg-accent-yellow text-ink' : 'bg-bg-white text-ink'}`}
+              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer ${authTab === 'login' ? 'bg-accent-primary text-white' : 'bg-bg-surface text-text-primary'}`}
               onClick={() => setAuthTab('login')}
             >
               Sign In
             </button>
             <button
-              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer border-l-3 border-ink ${authTab === 'signup' ? 'bg-accent-yellow text-ink' : 'bg-bg-white text-ink'}`}
+              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer border-l-3 border-border ${authTab === 'signup' ? 'bg-accent-primary text-white' : 'bg-bg-surface text-text-primary'}`}
               onClick={() => setAuthTab('signup')}
             >
               Sign Up
             </button>
           </div>
 
-          <button className="google-btn w-full py-3 brutal-btn brutal-btn-accent mb-4 text-sm" onClick={handleGoogleAuth}>
+          <button className="google-btn w-full py-3 brutal-btn brutal-btn-accent text-white mb-4 text-sm" onClick={handleGoogleAuth}>
             Continue with Google
           </button>
 
-          <div className="divider w-full flex items-center justify-center gap-3 brutal-title text-[10px] text-muted mb-4 uppercase">
+          <div className="divider w-full flex items-center justify-center gap-3 brutal-title text-[10px] text-text-secondary mb-4 uppercase">
             or use email
           </div>
 
           {authError && (
-            <div className="w-full brutal-card p-3 bg-status-danger text-ink font-bold text-xs mb-4 border-2">
+            <div className="w-full brutal-card p-3 bg-status-danger text-text-primary font-bold text-xs mb-4 border-2 border-border">
               ⚠️ {authError}
             </div>
           )}
@@ -409,7 +409,7 @@ export default function App() {
           <form onSubmit={handleAuthSubmit} className="w-full flex flex-col gap-4">
             {authTab === 'signup' && (
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-wide">Name</label>
+                <label className="text-[10px] font-extrabold uppercase tracking-wide text-text-primary">Name</label>
                 <input
                   type="text"
                   value={name}
@@ -421,7 +421,7 @@ export default function App() {
               </div>
             )}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-wide">Email</label>
+              <label className="text-[10px] font-extrabold uppercase tracking-wide text-text-primary">Email</label>
               <input
                 type="email"
                 value={email}
@@ -432,7 +432,7 @@ export default function App() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-wide">Password</label>
+              <label className="text-[10px] font-extrabold uppercase tracking-wide text-text-primary">Password</label>
               <input
                 type="password"
                 value={password}
@@ -462,21 +462,31 @@ export default function App() {
   // Main App Shell (Sidebar + Content layout pattern)
   // -------------------------------------------------------------
   return (
-    <div className="flex min-h-screen bg-bg-light text-ink">
+    <div className="flex min-h-screen bg-bg-canvas text-text-primary">
       {/* Fixed Sidebar Layout */}
-      <aside className="w-[280px] border-r-3 border-ink bg-bg-white flex flex-col justify-between flex-shrink-0">
+      <aside className="w-[280px] border-r-3 border-border bg-bg-surface flex flex-col justify-between flex-shrink-0">
         <div>
-          {/* Top Yellow Brand Strip */}
-          <div className="bg-bg-yellow p-6 border-b-3 border-ink flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-ink bg-ink flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" className="w-6 h-6">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-              </svg>
+          {/* Top Header Block */}
+          <div className="sidebar-header bg-bg-surface p-4 px-5 border-b-3 border-border flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 border-2 border-border bg-accent-primary text-white flex items-center justify-center flex-shrink-0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 className="brutal-title text-base leading-none font-black text-text-primary m-0">LEARNING OS</h2>
+                <span className="brutal-mono text-[9px] uppercase tracking-wider text-text-secondary font-bold">AUTOPILOT SDE MENTOR</span>
+              </div>
             </div>
-            <div>
-              <h2 className="brutal-title text-base leading-none font-black text-ink m-0">LEARNING OS</h2>
-              <span className="brutal-mono text-[9px] uppercase tracking-wider text-ink font-bold">AUTOPILOT SDE MENTOR</span>
-            </div>
+            <button
+              className="theme-toggle-btn brutal-btn w-9 h-9 p-0 flex-shrink-0"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
           </div>
 
           {/* Navigation Items Stacked */}
@@ -497,7 +507,7 @@ export default function App() {
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full text-left py-3.5 px-4 brutal-title text-xs font-black uppercase transition-all duration-75 cursor-pointer brutal-btn ${
-                    isActive ? 'bg-ink text-bg-white shadow-[0px_0px_0px_var(--ink)] translate-x-[3px] translate-y-[3px]' : 'bg-bg-white text-ink'
+                    isActive ? 'bg-accent-primary text-white shadow-[0px_0px_0px_var(--shadow-color)] translate-x-[3px] translate-y-[3px]' : 'bg-bg-surface text-text-primary'
                   }`}
                 >
                   {item.label}
@@ -508,7 +518,7 @@ export default function App() {
         </div>
 
         {/* Sidebar bottom block */}
-        <div className="p-4 border-t-3 border-ink bg-bg-white flex flex-col gap-3">
+        <div className="p-4 border-t-3 border-border bg-bg-surface flex flex-col gap-3">
           {/* Active safety / Reset CTA */}
           <button className="w-full py-3 brutal-btn brutal-btn-accent text-xs" onClick={generateWeeklyPlan}>
             ⚡ GENERATE AUTOPILOT PLAN
@@ -519,7 +529,7 @@ export default function App() {
           </button>
 
           {/* Dash line divider */}
-          <div className="border-t-2 border-dashed border-ink my-1"></div>
+          <div className="border-t-2 border-dashed border-border my-1"></div>
 
           {/* Pinned Monospace Footer */}
           <div className="brutal-mono text-[10px] uppercase font-bold leading-normal">
@@ -531,7 +541,15 @@ export default function App() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 min-h-screen p-8 bg-bg-light overflow-y-auto">
+      <main className="flex-1 min-w-0 min-h-screen p-8 bg-bg-canvas brutal-grid-paper overflow-y-auto relative">
+        <button
+          className="theme-toggle-btn absolute top-6 right-8 brutal-btn w-10 h-10 p-0 z-30"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
         {activeTab === 'dashboard' && (
           <Dashboard
             dailyTasks={dailyTasks}
@@ -603,6 +621,8 @@ export default function App() {
             preferences={preferences}
             savePrefs={savePreferences}
             triggerReset={triggerReset}
+            theme={theme}
+            toggleTheme={toggleTheme}
           />
         )}
       </main>

@@ -116,13 +116,13 @@ export default function Curriculum({
   return (
     <div className="flex flex-col gap-6 animate__animated animate__fadeIn">
       {/* 1. Horizontal Track selector buttons */}
-      <div className="flex gap-3 overflow-x-auto pb-2 border-b-3 border-ink">
+      <div className="flex gap-3 overflow-x-auto pb-2 border-b-3 border-border">
         {tracks.map(t => (
           <button
             key={t.id}
             onClick={() => setActiveTrack(t.id)}
             className={`brutal-btn py-2 px-5 text-xs font-black uppercase ${
-              activeTrack === t.id ? 'bg-accent-blue text-ink' : 'bg-bg-white text-ink'
+              activeTrack === t.id ? 'bg-accent-blue text-text-primary' : 'bg-bg-surface text-text-primary'
             }`}
           >
             {trackIcons[t.id] || '⚙️'} {t.name}
@@ -133,17 +133,17 @@ export default function Curriculum({
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Left Side Column: Topic Syllabus Lists */}
         <div className="md:col-span-4 flex flex-col gap-6">
-          <div className="brutal-card p-5 border-3 border-ink shadow-[6px_6px_0px_var(--ink)] bg-bg-white relative">
-            <div className="absolute top-0 right-0 w-6 h-6 bg-accent-pink border-l-3 border-b-3 border-ink"></div>
-            <h3 className="brutal-title text-sm font-black mb-4">SYLLABUS TOPICS</h3>
+          <div className="brutal-card p-5 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
+            <div className="absolute top-0 right-0 w-6 h-6 bg-accent-pink border-l-3 border-b-3 border-border"></div>
+            <h3 className="brutal-title text-sm font-black mb-4 text-text-primary">SYLLABUS TOPICS</h3>
 
             <div className="flex flex-col gap-2">
               {filteredTopics.map(topic => (
                 <button
                   key={topic.id}
                   onClick={() => setActiveTopic(topic.id)}
-                  className={`w-full text-left p-3 border-2 border-ink brutal-title text-xs font-black transition-all cursor-pointer ${
-                    activeTopic === topic.id ? 'bg-accent-pink text-ink' : 'bg-bg-white text-ink hover:translate-x-0.5'
+                  className={`w-full text-left p-3 border-2 border-border brutal-title text-xs font-black transition-all cursor-pointer ${
+                    activeTopic === topic.id ? 'bg-accent-pink text-text-primary' : 'bg-bg-surface text-text-primary hover:translate-x-0.5'
                   }`}
                 >
                   {topic.name}
@@ -153,17 +153,17 @@ export default function Curriculum({
           </div>
 
           {activeTopic && (
-            <div className="brutal-card p-5 border-3 border-ink shadow-[6px_6px_0px_var(--ink)] bg-bg-white relative">
-              <div className="absolute top-0 right-0 w-6 h-6 bg-accent-yellow border-l-3 border-b-3 border-ink"></div>
-              <h3 className="brutal-title text-sm font-black mb-4">SUBTOPICS</h3>
+            <div className="brutal-card p-5 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
+              <div className="absolute top-0 right-0 w-6 h-6 bg-accent-blue border-l-3 border-b-3 border-border"></div>
+              <h3 className="brutal-title text-sm font-black mb-4 text-text-primary">SUBTOPICS</h3>
 
               <div className="flex flex-col gap-2">
                 {filteredSubtopics.map(sub => (
                   <button
                     key={sub.id}
                     onClick={() => setActiveSubtopic(sub.id)}
-                    className={`w-full text-left p-2.5 border-2 border-ink brutal-title text-xs font-black transition-all cursor-pointer ${
-                      activeSubtopic === sub.id ? 'bg-accent-yellow text-ink' : 'bg-bg-white text-ink hover:translate-x-0.5'
+                    className={`w-full text-left p-2.5 border-2 border-border brutal-title text-xs font-black transition-all cursor-pointer ${
+                      activeSubtopic === sub.id ? 'bg-accent-blue text-text-primary' : 'bg-bg-surface text-text-primary hover:translate-x-0.5'
                     }`}
                   >
                     {sub.name}
@@ -177,18 +177,18 @@ export default function Curriculum({
         {/* Right Column: Active Syllabus content detail */}
         <div className="md:col-span-8">
           {currentSubtopic ? (
-            <div className="brutal-card p-6 border-3 border-ink shadow-[6px_6px_0px_var(--ink)] bg-bg-white relative">
-              <div className="absolute top-0 right-0 w-8 h-8 bg-accent-green border-l-3 border-b-3 border-ink"></div>
+            <div className="brutal-card p-6 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
+              <div className="absolute top-0 right-0 w-8 h-8 bg-accent-green border-l-3 border-b-3 border-border"></div>
 
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="brutal-title text-xl font-black m-0 leading-none">{currentSubtopic.name}</h2>
-                  <span className="brutal-mono text-xs text-muted block mt-2">
+                  <h2 className="brutal-title text-xl font-black m-0 leading-none text-text-primary">{currentSubtopic.name}</h2>
+                  <span className="brutal-mono text-xs text-text-secondary block mt-2">
                     Subtopic score: {subtopicMastery}%
                   </span>
                 </div>
                 <button
-                  className="brutal-btn py-1.5 px-4 text-xs bg-accent-green font-bold border-2"
+                  className="brutal-btn py-1.5 px-4 text-xs bg-accent-green text-text-primary font-bold border-2 border-border"
                   onClick={() => setShowAddForm(!showAddForm)}
                 >
                   {showAddForm ? 'CANCEL' : '+ ADD QUESTION'}
@@ -196,13 +196,13 @@ export default function Curriculum({
               </div>
 
               {/* Progress Tracker Horizontal bar */}
-              <div className="grid grid-cols-6 border-3 border-ink bg-bg-light p-3 mb-6 divide-x-2 divide-ink text-center">
+              <div className="grid grid-cols-6 border-3 border-border bg-bg-surface-alt p-3 mb-6 divide-x-2 divide-border text-center">
                 {['lessons', 'instructor', 'practice', 'checkpoint', 'revision', 'mastery'].map(step => {
                   const done = getSubtopicStepClass(step as any) === 'completed';
                   return (
                     <div key={step} className="flex flex-col items-center justify-center">
-                      <div className={`w-3.5 h-3.5 border-2 border-ink rounded-full ${done ? 'bg-status-success' : 'bg-bg-white'}`} />
-                      <span className="brutal-mono text-[9px] uppercase font-bold mt-1 leading-none">{step}</span>
+                      <div className={`w-3.5 h-3.5 border-2 border-border rounded-full ${done ? 'bg-status-success' : 'bg-bg-surface'}`} />
+                      <span className="brutal-mono text-[9px] uppercase font-bold mt-1 leading-none text-text-primary">{step}</span>
                     </div>
                   );
                 })}
@@ -210,8 +210,8 @@ export default function Curriculum({
 
               {/* Lesson details */}
               {currentSubtopic.lessonContent && (
-                <div className="border-3 border-ink bg-bg-light p-4 brutal-mono text-xs leading-relaxed mb-6">
-                  <span className="bg-ink text-bg-white px-2 py-0.5 brutal-title text-[9px] font-black uppercase mr-2">
+                <div className="border-3 border-border bg-bg-surface-alt p-4 brutal-mono text-xs leading-relaxed mb-6 text-text-primary">
+                  <span className="bg-text-primary text-bg-surface px-2 py-0.5 brutal-title text-[9px] font-black uppercase mr-2">
                     LESSON TEXT
                   </span>
                   {currentSubtopic.lessonContent}
@@ -220,17 +220,17 @@ export default function Curriculum({
 
               {/* Add form */}
               {showAddForm && (
-                <form onSubmit={handleSubmitProblem} className="border-3 border-ink p-5 bg-bg-light mb-6 flex flex-col gap-4">
-                  <h4 className="brutal-title text-sm font-black m-0">Log question under {currentSubtopic.name}</h4>
+                <form onSubmit={handleSubmitProblem} className="border-3 border-border p-5 bg-bg-surface-alt mb-6 flex flex-col gap-4">
+                  <h4 className="brutal-title text-sm font-black m-0 text-text-primary">Log question under {currentSubtopic.name}</h4>
                   
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-extrabold uppercase">Title</label>
+                    <label className="text-[10px] font-extrabold uppercase text-text-primary">Title</label>
                     <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Find duplicates in O(N)" className="brutal-input text-xs" required />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-extrabold uppercase">Platform</label>
+                      <label className="text-[10px] font-extrabold uppercase text-text-primary">Platform</label>
                       <select value={newPlatform} onChange={e => setNewPlatform(e.target.value)} className="brutal-select text-xs">
                         <option>LeetCode</option>
                         <option>Codeforces</option>
@@ -240,7 +240,7 @@ export default function Curriculum({
                       </select>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-extrabold uppercase">Difficulty</label>
+                      <label className="text-[10px] font-extrabold uppercase text-text-primary">Difficulty</label>
                       <select value={newDifficulty} onChange={e => setNewDifficulty(e.target.value as any)} className="brutal-select text-xs">
                         <option>Easy</option>
                         <option>Medium</option>
@@ -251,17 +251,17 @@ export default function Curriculum({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-extrabold uppercase">Est Time (mins)</label>
+                      <label className="text-[10px] font-extrabold uppercase text-text-primary">Est Time (mins)</label>
                       <input type="number" min="5" value={newEstTime} onChange={e => setNewEstTime(e.target.value)} className="brutal-input text-xs" required />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-extrabold uppercase">Pattern</label>
+                      <label className="text-[10px] font-extrabold uppercase text-text-primary">Pattern</label>
                       <input type="text" value={newPattern} onChange={e => setNewPattern(e.target.value)} placeholder="e.g. sliding window" className="brutal-input text-xs" />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-extrabold uppercase">URL</label>
+                    <label className="text-[10px] font-extrabold uppercase text-text-primary">URL</label>
                     <input type="url" value={newLink} onChange={e => setNewLink(e.target.value)} placeholder="https://leetcode.com/problems/..." className="brutal-input text-xs" />
                   </div>
 
@@ -273,30 +273,30 @@ export default function Curriculum({
 
               {/* Problems Stack list */}
               {subtopicProblems.length === 0 ? (
-                <div className="text-center brutal-mono text-xs text-muted p-10 border-3 border-dashed border-ink bg-bg-light">
+                <div className="text-center brutal-mono text-xs text-text-secondary p-10 border-3 border-dashed border-border bg-bg-surface-alt">
                   No active problems logged under this track topic section. Add one above.
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
                   {subtopicProblems.map(p => (
-                    <div key={p.id} className="border-3 border-ink p-4 bg-bg-white flex justify-between items-center transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--ink)]">
+                    <div key={p.id} className="border-3 border-border p-4 bg-bg-surface flex justify-between items-center transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]">
                       <div>
-                        <h4 className="brutal-title text-sm font-black m-0 leading-tight">{p.title}</h4>
-                        <span className="brutal-mono text-[10px] text-muted block mt-1">
+                        <h4 className="brutal-title text-sm font-black m-0 leading-tight text-text-primary">{p.title}</h4>
+                        <span className="brutal-mono text-[10px] text-text-secondary block mt-1">
                           {p.platform} · {p.pattern || 'No pattern tagged'} · {p.estimatedTime} mins est.
                         </span>
                       </div>
                       <div className="flex gap-2 items-center">
-                        <span className={`brutal-pill text-[9px] font-black ${
-                          p.difficulty === 'Easy' ? 'bg-accent-green' : p.difficulty === 'Medium' ? 'bg-accent-yellow' : 'bg-accent-pink'
+                        <span className={`brutal-pill text-[9px] font-black text-text-primary ${
+                          p.difficulty === 'Easy' ? 'bg-accent-green' : p.difficulty === 'Medium' ? 'bg-accent-blue' : 'bg-accent-pink'
                         }`}>
                           {p.difficulty}
                         </span>
-                        <span className="brutal-pill bg-bg-light text-[9px] font-black">
+                        <span className="brutal-pill bg-bg-surface-alt border-border text-[9px] font-black text-text-primary">
                           {p.status}
                         </span>
                         {p.link && (
-                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="brutal-btn py-1 px-3 text-[10px] border-2">
+                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="brutal-btn py-1 px-3 text-[10px] border-2 border-border text-text-primary">
                             SOLVE ↗
                           </a>
                         )}
@@ -310,7 +310,7 @@ export default function Curriculum({
               )}
             </div>
           ) : (
-            <div className="text-center brutal-mono text-xs text-muted p-12 border-3 border-dashed border-ink bg-bg-white brutal-card">
+            <div className="text-center brutal-mono text-xs text-text-secondary p-12 border-3 border-dashed border-border bg-bg-surface brutal-card">
               Select track topics on the left to see course roadmaps.
             </div>
           )}

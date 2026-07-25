@@ -1,38 +1,60 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-yellow: #F5CC4D;
-  --color-bg-yellow-dark: #E8B923;
-  --color-bg-light: #F2F3F5;
-  --color-bg-white: #FFFFFF;
-  --color-ink: #0A0A0A;
-  --color-muted: #6B7280;
+  --color-bg-canvas: var(--bg-canvas);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-alt: var(--bg-surface-alt);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-high-emphasis: var(--text-high-emphasis);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
+  --color-accent-hover-secondary: var(--accent-hover-secondary);
+  --color-border: var(--border);
+
+  --color-bg-light: var(--bg-surface-alt);
+  --color-bg-white: var(--bg-surface);
+  --color-ink: var(--text-primary);
+  --color-muted: var(--text-secondary);
   
-  --color-accent-blue: #6C93F5;
+  --color-accent-blue: #4A9FD8;
   --color-accent-pink: #F28FA3;
   --color-accent-green: #6FCF7E;
   --color-accent-purple: #B18CF0;
   --color-accent-orange: #F0A05A;
-  --color-accent-yellow: #F5CC4D;
+  --color-accent-yellow: #4A9FD8;
   
   --color-status-success: #6FCF7E;
   --color-status-danger: #F26D6D;
 }
 
 :root {
-  --bg-yellow: #F5CC4D;
-  --bg-yellow-dark: #E8B923;
-  --bg-light: #F2F3F5;
-  --bg-white: #FFFFFF;
-  --ink: #0A0A0A;
-  --muted: #6B7280;
+  --bg-canvas: #EEF6FB;
+  --bg-grid-line: #DCEBF5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #F4F9FD;
+  --text-primary: #141414;
+  --text-secondary: #5A6E7C;
+  --text-high-emphasis: #141414;
 
-  --accent-blue: #6C93F5;
+  --accent-primary: #4A9FD8;
+  --accent-primary-hover: #3585BE;
+  --accent-hover-secondary: #BFE0F2;
+
+  --border: #141414;
+  --shadow-color: #141414;
+
+  --bg-light: #F4F9FD;
+  --bg-white: #FFFFFF;
+  --ink: #141414;
+  --muted: #5A6E7C;
+
+  --accent-blue: #4A9FD8;
   --accent-pink: #F28FA3;
   --accent-green: #6FCF7E;
   --accent-purple: #B18CF0;
   --accent-orange: #F0A05A;
-  --accent-yellow: #F5CC4D;
+  --accent-yellow: #4A9FD8;
 
   --status-success: #6FCF7E;
   --status-danger: #F26D6D;
@@ -42,9 +64,25 @@
 }
 
 body.dark-mode {
-  --bg-light: #0F0F0F;
-  --bg-white: #1C1C1E;
-  --ink: #E5E5E5;
+  --bg-canvas: #0C0E12;
+  --bg-grid-line: #1A1A1E;
+  --bg-surface: #1C1E24;
+  --bg-surface-alt: #262933;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0AEC0;
+  --text-high-emphasis: #FFFFFF;
+
+  --accent-primary: #4A9FD8;
+  --accent-primary-hover: #3585BE;
+  --accent-hover-secondary: #2C3E50;
+
+  --border: #3F3F46;
+  --shadow-color: #000000;
+
+  --bg-light: #262933;
+  --bg-white: #1C1E24;
+  --ink: #FFFFFF;
+  --muted: #A0AEC0;
 }
 
 * {
@@ -52,69 +90,192 @@ body.dark-mode {
 }
 
 body {
-  background-color: var(--bg-light);
-  color: var(--ink);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   transition: background-color 0.15s ease-out, color 0.15s ease-out;
   margin: 0;
   padding: 0;
 }
 
-/* Hard borders & offset shadows signatures */
+/* =========================================================
+   DARK MODE EXPLICIT CONTRAST RULES
+   ========================================================= */
+
+/* Left Sidebar in Dark Mode: Light Black / Dark Navy background */
+body.dark-mode aside,
+body.dark-mode aside > div,
+body.dark-mode .sidebar-header {
+  background-color: #16181D !important;
+  color: #FFFFFF !important;
+  border-color: #3F3F46 !important;
+}
+
+body.dark-mode .sidebar-header *,
+body.dark-mode aside * {
+  color: #FFFFFF;
+}
+
+body.dark-mode aside .brutal-mono,
+body.dark-mode .sidebar-header .brutal-mono {
+  color: #A0AEC0 !important;
+}
+
+body.dark-mode nav .brutal-btn {
+  background-color: #22252E !important;
+  color: #FFFFFF !important;
+  border-color: #3F3F46 !important;
+}
+
+body.dark-mode nav .brutal-btn.bg-accent-primary,
+body.dark-mode nav .brutal-btn[class*="bg-accent-primary"] {
+  background-color: #4A9FD8 !important;
+  color: #FFFFFF !important;
+}
+
+/* All Cards in Dark Mode: Light Black / Dark Surface */
+body.dark-mode .brutal-card {
+  background-color: #1D1F26 !important;
+  color: #FFFFFF !important;
+  border-color: #3F3F46 !important;
+}
+
+/* All Headings and Titles in Dark Mode: Pure White */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .brutal-title,
+body.dark-mode .text-text-primary {
+  color: #FFFFFF !important;
+}
+
+body.dark-mode p,
+body.dark-mode label,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .text-text-secondary,
+body.dark-mode .text-muted,
+body.dark-mode .brutal-mono {
+  color: #A0AEC0 !important;
+}
+
+/* Nested Boxes inside cards: Light Black with White Text */
+body.dark-mode .bg-bg-surface-alt,
+body.dark-mode div[class*="bg-bg-surface-alt"] {
+  background-color: #262933 !important;
+  color: #FFFFFF !important;
+  border-color: #3F3F46 !important;
+}
+
+body.dark-mode .bg-bg-surface-alt *,
+body.dark-mode div[class*="bg-bg-surface-alt"] * {
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .bg-bg-surface-alt .text-text-secondary,
+body.dark-mode div[class*="bg-bg-surface-alt"] .text-text-secondary,
+body.dark-mode .bg-bg-surface-alt .brutal-mono,
+body.dark-mode div[class*="bg-bg-surface-alt"] .brutal-mono {
+  color: #CBD5E1 !important;
+}
+
+/* Bright Accent Badges / Pills: Dark Readable Text */
+.bg-accent-pink,
+.bg-accent-pink *,
+.bg-accent-green,
+.bg-accent-green *,
+.bg-accent-orange,
+.bg-accent-orange *,
+.bg-status-success,
+.bg-status-success * {
+  color: #0A0A0A !important;
+}
+
+/* Primary CTA Buttons */
+.brutal-btn-accent,
+.brutal-btn-accent * {
+  background-color: #4A9FD8 !important;
+  color: #FFFFFF !important;
+}
+
+.brutal-btn-accent:hover {
+  background-color: #3585BE !important;
+}
+
+/* Structural Neo-brutalist styles */
 .brutal-card {
-  border: 3px solid var(--ink);
-  box-shadow: 6px 6px 0px var(--ink);
+  border: 3px solid var(--border);
+  box-shadow: 6px 6px 0px var(--shadow-color);
   border-radius: 0px;
-  background-color: var(--bg-white);
-  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background-color 0.15s ease-out, color 0.15s ease-out;
 }
 
 .brutal-card:active {
   transform: translate(3px, 3px);
-  box-shadow: 0px 0px 0px var(--ink);
+  box-shadow: 0px 0px 0px var(--shadow-color);
 }
 
 .brutal-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid var(--ink);
-  box-shadow: 4px 4px 0px var(--ink);
+  border: 3px solid var(--border);
+  box-shadow: 4px 4px 0px var(--shadow-color);
   border-radius: 0px;
-  background-color: var(--bg-white);
-  color: var(--ink);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
   font-family: var(--font-grotesk);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background-color 0.15s ease-out, color 0.15s ease-out;
 }
 
 .brutal-btn:hover {
-  box-shadow: 6px 6px 0px var(--ink);
+  box-shadow: 6px 6px 0px var(--shadow-color);
+  background-color: var(--accent-hover-secondary);
 }
 
 .brutal-btn:active {
   transform: translate(3px, 3px);
-  box-shadow: 0px 0px 0px var(--ink);
+  box-shadow: 0px 0px 0px var(--shadow-color);
 }
 
 .brutal-btn-primary {
-  background-color: var(--ink);
-  color: var(--bg-white);
+  background-color: var(--text-high-emphasis);
+  color: var(--bg-surface);
 }
 
-.brutal-btn-accent {
-  background-color: var(--accent-yellow);
-  color: #0A0A0A;
+body.dark-mode .brutal-btn-primary {
+  background-color: #4A9FD8;
+  color: #FFFFFF !important;
+}
+
+.brutal-btn-primary:hover {
+  background-color: #2D2D2D;
+  color: #FFFFFF;
+}
+
+body.dark-mode .brutal-btn-primary:hover {
+  background-color: #3585BE;
+  color: #FFFFFF !important;
 }
 
 /* Monospace metadata metrics */
 .brutal-mono {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  color: var(--muted);
+  color: var(--text-secondary);
 }
 
 /* Grotesk Headings */
@@ -127,7 +288,7 @@ body {
 
 /* Stamped badges / pills */
 .brutal-pill {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--border);
   border-radius: 9999px;
   padding: 2px 10px;
   font-size: 11px;
@@ -144,7 +305,7 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,18 +316,26 @@ body {
 
 /* Grid paper background utility */
 .brutal-grid-paper {
-  background-color: var(--bg-yellow);
+  background-color: var(--bg-canvas);
   background-image: 
-    linear-gradient(var(--bg-yellow-dark) 1.5px, transparent 1.5px),
-    linear-gradient(90deg, var(--bg-yellow-dark) 1.5px, transparent 1.5px);
+    linear-gradient(var(--bg-grid-line) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--bg-grid-line) 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+}
+
+body.dark-mode .brutal-grid-paper {
+  background-color: #0C0E12;
+  background-image: 
+    linear-gradient(rgba(36, 36, 46, 0.8) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(36, 36, 46, 0.8) 1.5px, transparent 1.5px);
   background-size: 40px 40px;
 }
 
 /* Rotated ribbon callout sticker */
 .brutal-sticker {
-  background-color: var(--ink);
-  color: var(--bg-white);
-  border: 2px solid var(--ink);
+  background-color: var(--text-primary);
+  color: var(--bg-surface);
+  border: 2px solid var(--border);
   padding: 4px 12px;
   font-family: var(--font-grotesk);
   font-weight: 800;
@@ -179,35 +348,37 @@ body {
 
 /* Custom inputs inside brutal system */
 .brutal-input {
-  border: 3px solid var(--ink);
+  border: 3px solid var(--border);
   border-radius: 0px;
-  background-color: var(--bg-white);
-  color: var(--ink);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
   font-family: var(--font-mono);
   padding: 10px 14px;
   outline: none;
-  box-shadow: 4px 4px 0px var(--ink);
+  box-shadow: 4px 4px 0px var(--shadow-color);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
 }
 
 .brutal-input:focus {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--ink);
+  box-shadow: 6px 6px 0px var(--shadow-color);
 }
 
 .brutal-select {
-  border: 3px solid var(--ink);
+  border: 3px solid var(--border);
   border-radius: 0px;
-  background-color: var(--bg-white);
-  color: var(--ink);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
   font-family: var(--font-grotesk);
   font-weight: 700;
   padding: 10px 14px;
   outline: none;
-  box-shadow: 4px 4px 0px var(--ink);
+  box-shadow: 4px 4px 0px var(--shadow-color);
   cursor: pointer;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
 }
 
 .brutal-select:focus {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--ink);
+  box-shadow: 6px 6px 0px var(--shadow-color);
 }
