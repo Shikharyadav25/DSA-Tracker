@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { Problem } from '../types/learningOS';
 import { aiService } from '../services/ai';
+import { CheckCircle2, ExternalLink } from 'lucide-react';
 
 interface RevisionProps {
   problems: Problem[];
-  submitReview: (problemId: string, ratingScore: number) => Promise<void>;
+  saveProblem?: (problem: Problem) => Promise<void>;
+  submitReview?: (problemId: string, ratingScore: number) => Promise<void>;
 }
 
-export default function Revision({ problems, submitReview }: RevisionProps) {
+export default function Revision({ problems = [], saveProblem, submitReview }: RevisionProps) {
   // Filter problems due for review
-  const todayStr = new Date().toISOString().split('T')[0];
-  const dueProblems = problems.filter(p => !p.nextReview || p.nextReview <= todayStr);
+  const nowTs = Date.now();
+  const dueProblems = problems.filter(p => {
+    if (!p.nextReview) return true;
+    if (typeof p.nextReview === 'number') return p.nextReview <= nowTs;
+    const ms = new Date(p.nextReview).getTime();
+    return isNaN(ms) || ms <= nowTs;
+  });
   const activeProblem = dueProblems[0] || null;
 
   const [solveTime, setSolveTime] = useState('15');
@@ -33,16 +40,40 @@ export default function Revision({ problems, submitReview }: RevisionProps) {
     if (!activeProblem) return;
     setEvaluating(true);
 
-    const evalResult = await aiService.evaluateSpacedRepetition(
-      activeProblem.title,
-      score,
-      parseInt(solveTime) || 15,
-      parseInt(hintsCount) || 0,
-      parseInt(mistakesCount) || 0
-    );
+    try {
+      const evalResult = await aiService.evaluateSpacedRepetition(
+        activeProblem.title,
+        score,
+        parseInt(solveTime) || 15,
+        parseInt(hintsCount) || 0,
+        parseInt(mistakesCount) || 0
+      );
+      setAiEvaluation(evalResult);
+    } catch (err) {
+      console.error('AI evaluation error', err);
+    }
 
-    setAiEvaluation(evalResult);
-    await submitReview(activeProblem.id, score);
+    const intervalDaysMap: Record<number, number> = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30 };
+    const days = intervalDaysMap[score] || 7;
+    const nextReviewTs = Date.now() + days * 24 * 60 * 60 * 1000;
+    const currentBox = activeProblem.box || 1;
+    const nextBox = score >= 3 ? Math.min(5, currentBox + 1) : 1;
+
+    const updatedProblem: Problem = {
+      ...activeProblem,
+      box: nextBox,
+      interval: days,
+      nextReview: nextReviewTs,
+      lastSolved: Date.now(),
+      status: 'Solved'
+    };
+
+    if (saveProblem) {
+      await saveProblem(updatedProblem);
+    } else if (submitReview) {
+      await submitReview(activeProblem.id, score);
+    }
+
     setEvaluating(false);
 
     // Reset inputs

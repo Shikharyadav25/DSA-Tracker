@@ -583,7 +583,6 @@ export default function App() {
           <Revision
             problems={problems}
             saveProblem={saveProblem}
-            userId={user.uid}
           />
         )}
         {activeTab === 'interview' && (
