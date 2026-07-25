@@ -3,13 +3,12 @@ import { AppUser, registerAuthObserver, logout, loginAsGuest, loginWithGoogle, s
 import { dbService } from './services/db';
 import { aiService } from './services/ai';
 import * as Types from './types/learningOS';
+import { Calendar, BookOpen, RefreshCw, Briefcase, BarChart3, Settings as SettingsIcon, Sun, Moon, AlertTriangle, Zap, Flame } from 'lucide-react';
 
 // Component Views
 import Dashboard from './components/Dashboard';
 import Curriculum from './components/Curriculum';
 import Revision from './components/Revision';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
 import InterviewPrep from './components/InterviewPrep';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
@@ -359,11 +358,11 @@ export default function App() {
           </div>
 
           <button
-            className="theme-toggle-btn absolute top-4 right-4 brutal-btn w-10 h-10 p-0"
+            className="theme-toggle-btn absolute top-4 right-4 brutal-btn w-10 h-10 p-0 flex items-center justify-center"
             onClick={toggleTheme}
             aria-label="Toggle theme"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
           </button>
 
           <div className="w-full flex flex-col items-center mb-8 mt-4 text-center">
@@ -403,8 +402,9 @@ export default function App() {
           </div>
 
           {authError && (
-            <div className="w-full brutal-card p-3 bg-status-danger text-text-primary font-bold text-xs mb-4 border-2 border-border">
-              ⚠️ {authError}
+            <div className="w-full brutal-card p-3 bg-status-danger text-text-primary font-bold text-xs mb-4 border-2 border-border flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-accent-red shrink-0" />
+              <span>{authError}</span>
             </div>
           )}
 
@@ -482,37 +482,37 @@ export default function App() {
               </div>
             </div>
             <button
-              className="theme-toggle-btn brutal-btn w-9 h-9 p-0 flex-shrink-0"
+              className="theme-toggle-btn brutal-btn w-9 h-9 p-0 flex items-center justify-center flex-shrink-0"
               onClick={toggleTheme}
               aria-label="Toggle theme"
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
           </div>
 
           {/* Navigation Items Stacked */}
           <nav className="p-4 flex flex-col gap-3">
             {[
-              { id: 'dashboard', label: '📅 Plan Board' },
-              { id: 'curriculum', label: '📚 Curriculum' },
-              { id: 'revision', label: '🔄 Revision SR' },
-              { id: 'skills', label: '⚙️ Skills Path' },
-              { id: 'projects', label: '🚀 Projects' },
-              { id: 'interview', label: '💼 Interview' },
-              { id: 'analytics', label: '📊 Analytics' },
-              { id: 'settings', label: '⚙️ Settings' }
+              { id: 'dashboard', label: 'Plan Board', icon: Calendar },
+              { id: 'curriculum', label: 'Curriculum', icon: BookOpen },
+              { id: 'revision', label: 'Revision SR', icon: RefreshCw },
+              { id: 'interview', label: 'Interview', icon: Briefcase },
+              { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+              { id: 'settings', label: 'Settings', icon: SettingsIcon }
             ].map(item => {
               const isActive = activeTab === item.id;
+              const IconComp = item.icon;
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full text-left py-3.5 px-4 brutal-title text-xs font-black uppercase transition-all duration-75 cursor-pointer brutal-btn ${
+                  className={`w-full text-left py-3.5 px-4 brutal-title text-xs font-black uppercase transition-all duration-75 cursor-pointer brutal-btn flex items-center gap-2.5 ${
                     isActive ? 'bg-accent-primary text-white shadow-[0px_0px_0px_var(--shadow-color)] translate-x-[3px] translate-y-[3px]' : 'bg-bg-surface text-text-primary'
                   }`}
                 >
-                  {item.label}
+                  <IconComp className="w-4 h-4 shrink-0" />
+                  <span>{item.label}</span>
                 </button>
               );
             })}
@@ -522,8 +522,9 @@ export default function App() {
         {/* Sidebar bottom block */}
         <div className="p-4 border-t-3 border-border bg-bg-surface flex flex-col gap-3">
           {/* Active safety / Reset CTA */}
-          <button className="w-full py-3 brutal-btn brutal-btn-accent text-xs" onClick={generateWeeklyPlan}>
-            ⚡ GENERATE AUTOPILOT PLAN
+          <button className="w-full py-3 brutal-btn brutal-btn-accent text-xs flex items-center justify-center gap-1.5" onClick={generateWeeklyPlan}>
+            <Zap className="w-4 h-4 shrink-0" />
+            <span>GENERATE AUTOPILOT PLAN</span>
           </button>
           
           <button className="w-full py-2.5 brutal-btn text-xs" onClick={logout}>
@@ -537,7 +538,9 @@ export default function App() {
           <div className="brutal-mono text-[10px] uppercase font-bold leading-normal">
             <div>User: {user.name}</div>
             <div>Mode: {user.isGuest ? 'Sandbox' : 'Firestore'}</div>
-            <div>Streak: {streaks?.currentStreak || 0} days 🔥</div>
+            <div className="flex items-center gap-1">
+              Streak: {streaks?.currentStreak || 0} days <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            </div>
           </div>
         </div>
       </aside>
@@ -545,12 +548,12 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 min-w-0 min-h-screen p-8 bg-bg-canvas brutal-grid-paper overflow-y-auto relative">
         <button
-          className="theme-toggle-btn absolute top-6 right-8 brutal-btn w-10 h-10 p-0 z-30"
+          className="theme-toggle-btn absolute top-6 right-8 brutal-btn w-10 h-10 p-0 z-30 flex items-center justify-center"
           onClick={toggleTheme}
           aria-label="Toggle theme"
           title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-          {theme === 'dark' ? '☀️' : '🌙'}
+          {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
         </button>
         {activeTab === 'dashboard' && (
           <Dashboard
@@ -581,22 +584,6 @@ export default function App() {
             problems={problems}
             saveProblem={saveProblem}
             userId={user.uid}
-          />
-        )}
-        {activeTab === 'skills' && (
-          <Skills
-            skillTracks={skillTracks}
-            skills={skills}
-            saveSkill={saveSkill}
-          />
-        )}
-        {activeTab === 'projects' && (
-          <Projects
-            projects={projects}
-            projectMilestones={projectMilestones}
-            setProjectMilestones={setProjectMilestones}
-            saveProject={saveProject}
-            deleteProject={deleteProject}
           />
         )}
         {activeTab === 'interview' && (

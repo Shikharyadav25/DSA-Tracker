@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserPreference } from '../types/learningOS';
+import { Sun, Moon, Check } from 'lucide-react';
 
 interface SettingsProps {
   preferences: UserPreference | null;
@@ -74,7 +75,7 @@ export default function Settings({
     };
 
     await savePreferences(updatedPref);
-    setMsg('SETTINGS SAVED SUCCESSFULLY ✓');
+    setMsg('SETTINGS SAVED SUCCESSFULLY');
     setTimeout(() => setMsg(''), 3000);
   };
 
@@ -83,7 +84,7 @@ export default function Settings({
     setReseeding(true);
     await reseedMockData();
     setReseeding(false);
-    setMsg('DATABASE RE-SEEDED ✓');
+    setMsg('DATABASE RE-SEEDED');
     setTimeout(() => setMsg(''), 3000);
   };
 
@@ -110,7 +111,11 @@ export default function Settings({
               <div className="flex items-center justify-between border-3 border-border p-4 bg-bg-surface-alt shadow-[3px_3px_0px_var(--shadow-color)]">
                 <div>
                   <div className="font-extrabold text-xs uppercase brutal-title flex items-center gap-2 text-text-primary">
-                    Current Mode: {theme === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}
+                    Current Mode: {theme === 'dark' ? (
+                      <span className="flex items-center gap-1">Dark Mode <Moon className="w-3.5 h-3.5 text-slate-700 inline" /></span>
+                    ) : (
+                      <span className="flex items-center gap-1">Light Mode <Sun className="w-3.5 h-3.5 text-amber-400 inline" /></span>
+                    )}
                   </div>
                   <div className="brutal-mono text-[10px] text-text-secondary">Toggle application visual color theme</div>
                 </div>
@@ -119,7 +124,11 @@ export default function Settings({
                   onClick={toggleTheme}
                   className="brutal-btn py-2 px-4 text-xs font-black flex items-center gap-2"
                 >
-                  {theme === 'dark' ? '☀️ Switch to Light' : '🌙 Switch to Dark'}
+                  {theme === 'dark' ? (
+                    <><Sun className="w-4 h-4 text-amber-400" /><span>Switch to Light</span></>
+                  ) : (
+                    <><Moon className="w-4 h-4 text-slate-700" /><span>Switch to Dark</span></>
+                  )}
                 </button>
               </div>
             </div>

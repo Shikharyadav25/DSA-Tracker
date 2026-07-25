@@ -64,7 +64,7 @@ export default function Revision({ problems, submitReview }: RevisionProps) {
 
       {!activeProblem ? (
         <div className="brutal-card p-10 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface text-center">
-          <span className="text-4xl mb-3 block">🏁</span>
+          <CheckCircle2 className="w-12 h-12 mb-3 mx-auto text-accent-green shrink-0" />
           <h3 className="brutal-title text-base font-extrabold mb-1 text-text-primary">REVISION QUEUE EMPTY</h3>
           <p className="brutal-mono text-xs text-text-secondary max-w-[280px] mx-auto">
             All solved problems are up to date. Work on syllabus curriculum tasks today!
@@ -95,9 +95,10 @@ export default function Revision({ problems, submitReview }: RevisionProps) {
                 href={activeProblem.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="brutal-btn brutal-btn-primary py-2 px-5 text-xs inline-flex"
+                className="brutal-btn brutal-btn-primary py-2 px-5 text-xs inline-flex items-center gap-1.5"
               >
-                OPEN PROBLEM LINK ↗
+                <span>OPEN PROBLEM LINK</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0" />
               </a>
             )}
 

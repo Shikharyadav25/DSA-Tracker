@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LearningTrack, Topic, Subtopic, Problem } from '../types/learningOS';
+import { BookOpen, Server, Rocket, Brain, Cpu, FileText, ExternalLink, X, Settings } from 'lucide-react';
 
 interface CurriculumProps {
   tracks: LearningTrack[];
@@ -104,13 +105,16 @@ export default function Curriculum({
     return 'pending';
   };
 
-  const trackIcons: Record<string, string> = {
-    dsa: '📚',
-    backend: '⚙️',
-    projects: '🚀',
-    aptitude: '🧠',
-    core_cs: '💻',
-    resume: '📄'
+  const getTrackIcon = (id: string) => {
+    switch (id) {
+      case 'dsa': return <BookOpen className="w-3.5 h-3.5 shrink-0" />;
+      case 'backend': return <Server className="w-3.5 h-3.5 shrink-0" />;
+      case 'projects': return <Rocket className="w-3.5 h-3.5 shrink-0" />;
+      case 'aptitude': return <Brain className="w-3.5 h-3.5 shrink-0" />;
+      case 'core_cs': return <Cpu className="w-3.5 h-3.5 shrink-0" />;
+      case 'resume': return <FileText className="w-3.5 h-3.5 shrink-0" />;
+      default: return <Settings className="w-3.5 h-3.5 shrink-0" />;
+    }
   };
 
   return (
@@ -121,11 +125,12 @@ export default function Curriculum({
           <button
             key={t.id}
             onClick={() => setActiveTrack(t.id)}
-            className={`brutal-btn py-2 px-5 text-xs font-black uppercase ${
+            className={`brutal-btn py-2 px-5 text-xs font-black uppercase flex items-center gap-2 ${
               activeTrack === t.id ? 'bg-accent-blue text-text-primary' : 'bg-bg-surface text-text-primary'
             }`}
           >
-            {trackIcons[t.id] || '⚙️'} {t.name}
+            {getTrackIcon(t.id)}
+            <span>{t.name}</span>
           </button>
         ))}
       </div>
@@ -296,12 +301,13 @@ export default function Curriculum({
                           {p.status}
                         </span>
                         {p.link && (
-                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="brutal-btn py-1 px-3 text-[10px] border-2 border-border text-text-primary">
-                            SOLVE ↗
+                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="brutal-btn py-1 px-3 text-[10px] border-2 border-border text-text-primary flex items-center gap-1">
+                            <span>SOLVE</span>
+                            <ExternalLink className="w-3 h-3 shrink-0" />
                           </a>
                         )}
-                        <button onClick={() => deleteProblem(p.id)} className="text-status-danger font-bold text-sm cursor-pointer ml-1">
-                          ✕
+                        <button onClick={() => deleteProblem(p.id)} className="text-status-danger hover:text-accent-red font-bold text-sm cursor-pointer ml-1 p-1">
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     </div>

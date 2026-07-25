@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DailyTask, WeeklyPlan, UserPreference, AIInsight, Problem, Skill } from '../types/learningOS';
 import { aiService } from '../services/ai';
+import { Calendar, Zap, Lightbulb, Flame, Hourglass, Check, X, RefreshCw, Bot, Send } from 'lucide-react';
 
 interface DashboardProps {
   dailyTasks: DailyTask[];
@@ -104,13 +105,14 @@ export default function Dashboard({
 
             {todayTasks.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-center p-10 border-3 border-dashed border-border bg-bg-surface-alt">
-                <span className="text-3xl mb-3">📅</span>
+                <Calendar className="w-10 h-10 mb-3 text-text-secondary" />
                 <h3 className="brutal-title text-base font-extrabold mb-1 text-text-primary">NO TASKS CONFIGURED TODAY</h3>
                 <p className="brutal-mono text-xs text-text-secondary max-w-[280px] mb-6">
                   Autopilot scheduling is awaiting weekly target definitions.
                 </p>
-                <button className="brutal-btn brutal-btn-accent py-3 px-6 text-xs" onClick={generateWeeklyPlan}>
-                  ⚡ GENERATE WEEKLY Sprints
+                <button className="brutal-btn brutal-btn-accent py-3 px-6 text-xs flex items-center justify-center gap-2" onClick={generateWeeklyPlan}>
+                  <Zap className="w-4 h-4 shrink-0" />
+                  <span>GENERATE WEEKLY Sprints</span>
                 </button>
               </div>
             ) : (
@@ -154,8 +156,12 @@ export default function Dashboard({
                           </button>
                         </div>
                       ) : (
-                        <span className="brutal-mono text-[10px] font-black uppercase tracking-wider text-text-primary">
-                          {isDone ? 'COMPLETED ✓' : 'SKIPPED / POSTPONED ✕'}
+                        <span className="brutal-mono text-[10px] font-black uppercase tracking-wider text-text-primary flex items-center gap-1">
+                          {isDone ? (
+                            <>COMPLETED <Check className="w-3.5 h-3.5 text-accent-green" /></>
+                          ) : (
+                            <>SKIPPED / POSTPONED <X className="w-3.5 h-3.5 text-accent-red" /></>
+                          )}
                         </span>
                       )}
                     </div>
@@ -178,8 +184,9 @@ export default function Dashboard({
                     </span>
                     {ins.content}
                     {ins.actionItem && (
-                      <div className="mt-2 text-accent-pink font-extrabold uppercase text-[10px] brutal-title">
-                        💡 ACTION: {ins.actionItem}
+                      <div className="mt-2 text-accent-pink font-extrabold uppercase text-[10px] brutal-title flex items-center gap-1">
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>ACTION: {ins.actionItem}</span>
                       </div>
                     )}
                   </div>
@@ -196,7 +203,7 @@ export default function Dashboard({
             <div className="absolute top-0 right-0 w-8 h-8 bg-accent-orange border-l-3 border-b-3 border-border"></div>
             <h3 className="brutal-title text-base font-black mb-3 text-text-primary">STREAK HEALTH</h3>
             <div className="flex items-center gap-4">
-              <span className="text-4xl">🔥</span>
+              <Flame className="w-10 h-10 text-amber-500 fill-amber-500 shrink-0" />
               <div>
                 <div className="brutal-title text-2xl font-black text-text-primary">{streak} DAYS</div>
                 <div className="brutal-mono text-[10px] font-bold uppercase leading-none mt-1 text-text-secondary">
@@ -246,8 +253,9 @@ export default function Dashboard({
                   </p>
                 </div>
 
-                <div className="border-t border-border pt-3 brutal-mono text-[10px] font-bold uppercase text-text-secondary">
-                  ⏳ Syllabus Grad: {aiReport.completionTimeEstimate}
+                <div className="border-t border-border pt-3 brutal-mono text-[10px] font-bold uppercase text-text-secondary flex items-center gap-1.5">
+                  <Hourglass className="w-3.5 h-3.5 text-accent-primary shrink-0" />
+                  <span>Syllabus Grad: {aiReport.completionTimeEstimate}</span>
                 </div>
               </div>
             ) : (

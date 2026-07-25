@@ -1,5 +1,6 @@
 import React from 'react';
 import { DailyTask } from '../types/learningOS';
+import { Check, X, Brain } from 'lucide-react';
 
 interface InterviewPrepProps {
   dailyTasks: DailyTask[];
@@ -73,8 +74,8 @@ export default function InterviewPrep({ dailyTasks, handleTaskAction }: Intervie
                           </button>
                         </div>
                       ) : (
-                        <span className="brutal-mono text-[9px] font-black uppercase text-text-primary">
-                          {isDone ? 'COMPLETED ✓' : 'SKIPPED ✕'}
+                        <span className="brutal-mono text-[9px] font-black uppercase text-text-primary flex items-center gap-1">
+                          {isDone ? <>COMPLETED <Check className="w-3.5 h-3.5 text-accent-green" /></> : <>SKIPPED <X className="w-3.5 h-3.5 text-accent-red" /></>}
                         </span>
                       )}
                     </div>
@@ -104,8 +105,9 @@ export default function InterviewPrep({ dailyTasks, handleTaskAction }: Intervie
 
                     <div className="flex flex-wrap gap-2">
                       {subDecks.map((deck, idx) => (
-                        <div key={idx} className="brutal-pill bg-bg-surface border-border text-[10px] font-bold text-text-primary">
-                          🧠 {deck}
+                        <div key={idx} className="brutal-pill bg-bg-surface border-border text-[10px] font-bold text-text-primary flex items-center gap-1.5">
+                          <Brain className="w-3 h-3 text-accent-primary shrink-0" />
+                          <span>{deck}</span>
                         </div>
                       ))}
                     </div>

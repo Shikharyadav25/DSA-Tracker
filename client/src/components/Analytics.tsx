@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Problem, Skill, Project, DailyTask, Contest, ContestAttempt } from '../types/learningOS';
 import { dbService } from '../services/db';
+import { Zap, Flag, Calendar } from 'lucide-react';
 
 interface AnalyticsProps {
   problems: Problem[];
@@ -189,10 +190,17 @@ export default function Analytics({
             <div className="absolute top-0 right-0 w-8 h-8 bg-accent-blue border-l-3 border-b-3 border-border"></div>
             <h3 className="brutal-title text-base font-black mb-3 text-text-primary">AUTOPILOT FORECASTS</h3>
             <div className="flex flex-col gap-2 brutal-mono text-xs font-bold text-text-primary">
-              <div>🏎️ VELOCITY: {projections.velocity} Problems/week solved</div>
-              <div>🏁 WEEKS REMAINING: {projections.weeksRemaining} week(s) to completion</div>
-              <div className="border-t border-border pt-2 text-sm uppercase brutal-title font-black mt-1 text-text-primary">
-                📅 TARGET GRADUATION: {projections.completionStr}
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-accent-primary shrink-0" />
+                <span>VELOCITY: {projections.velocity} Problems/week solved</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Flag className="w-3.5 h-3.5 text-accent-green shrink-0" />
+                <span>WEEKS REMAINING: {projections.weeksRemaining} week(s) to completion</span>
+              </div>
+              <div className="border-t border-border pt-2 text-sm uppercase brutal-title font-black mt-1 text-text-primary flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-accent-primary shrink-0" />
+                <span>TARGET GRADUATION: {projections.completionStr}</span>
               </div>
             </div>
           </div>
