@@ -450,7 +450,12 @@ app.post('/api/coach/chat', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5005;
-app.listen(PORT, () => {
-  console.log(`Learning OS Backend listening on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5005;
+  app.listen(PORT, () => {
+    console.log(`Learning OS Backend listening on port ${PORT}`);
+  });
+}
+
+export default app;
+
