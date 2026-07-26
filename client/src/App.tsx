@@ -38,11 +38,14 @@ const GoogleLogo = () => (
 export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authInfo, setAuthInfo] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [authTab, setAuthTab] = useState<'login' | 'signup'>('login');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -417,8 +420,9 @@ export default function App() {
         <div className="relative brutal-card max-w-[420px] w-full p-10 bg-bg-white flex flex-col items-center">
           {/* Tagline stickers rotated */}
           <div className="absolute -top-4 -left-4 brutal-sticker">
-            leet track OS
+            SDE Preperation Tracker
           </div>
+
 
           <button
             className="theme-toggle-btn absolute top-4 right-4 brutal-btn w-10 h-10 p-0 flex items-center justify-center"
@@ -438,11 +442,24 @@ export default function App() {
           </div>
 
           {authError && (
-            <div className="w-full brutal-card p-3 bg-status-danger text-text-primary font-bold text-xs mb-6 border-2 border-border flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-accent-red shrink-0" />
-              <span>{authError}</span>
+            <div className="w-full brutal-card p-3 bg-red-100 dark:bg-red-950/80 text-red-900 dark:text-red-200 font-bold text-xs mb-6 border-2 border-red-500 flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <div className="flex-1 font-mono text-[11px] leading-relaxed select-text">
+                {authError}
+              </div>
             </div>
           )}
+
+          {authInfo && (
+            <div className="w-full brutal-card p-3 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 font-bold text-xs mb-6 border-2 border-emerald-500 flex items-start gap-2.5">
+              <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <div className="flex-1 font-mono text-[11px] leading-relaxed select-text">
+                {authInfo}
+              </div>
+            </div>
+          )}
+
+
 
           <button 
             type="button"
@@ -520,8 +537,14 @@ export default function App() {
               </div>
               <div>
                 <h2 className="brutal-title text-base leading-none font-black text-text-primary m-0">LEET TRACK</h2>
-                <span className="brutal-mono text-[9px] uppercase tracking-wider text-text-secondary font-bold">AUTOPILOT SDE MENTOR</span>
+                <span className="brutal-mono text-[9px] uppercase tracking-wider text-text-secondary font-bold leading-tight block mt-0.5">PREAPRE YOUR PREPERATION STRATEGY</span>
               </div>
+
+
+
+
+
+
             </div>
             <button
               className="hidden md:flex theme-toggle-btn brutal-btn w-9 h-9 p-0 items-center justify-center flex-shrink-0"

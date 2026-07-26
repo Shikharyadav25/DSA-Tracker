@@ -1,6 +1,8 @@
 import { auth, googleProvider } from './firebase';
 import { 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut as firebaseSignOut, 
@@ -43,16 +45,63 @@ export async function loginAsGuest(): Promise<void> {
   }
 }
 
+export function formatAuthError(error: any): string {
+
+  if (!error) return 'An unknown authentication error occurred.';
+  const code = error.code || '';
+  const message = error.message || '';
+
+  if (code === 'auth/unauthorized-domain' || message.includes('auth/unauthorized-domain')) {
+    const currentDomain = window.location.hostname || 'your domain';
+    return `Domain non-authorized (${currentDomain}). In Firebase Console -> Authentication -> Settings -> Authorized Domains, please add "${currentDomain}".`;
+  }
+  if (code === 'auth/operation-not-allowed' || message.includes('auth/operation-not-allowed')) {
+    return 'Google Sign-In is disabled in your Firebase project. Go to Firebase Console -> Authentication -> Sign-in method -> Google and click Enable.';
+  }
+  if (code === 'auth/popup-blocked') {
+    return 'Sign-in popup was blocked by your browser. Please disable popup blocker for this site or click Continue with Google again.';
+  }
+  if (code === 'auth/popup-closed-by-user') {
+    return 'Google Sign-In popup was closed before completing.';
+  }
+  if (code === 'auth/cancelled-popup-request') {
+    return 'Sign-in request was cancelled.';
+  }
+  if (code === 'auth/account-exists-with-different-credential') {
+    return 'An account already exists with the same email address using a different sign-in method.';
+  }
+  if (code === 'auth/network-request-failed') {
+    return 'Network connection error. Please check your internet connection and try again.';
+  }
+  if (code === 'auth/invalid-api-key') {
+    return 'Invalid Firebase API Key. Please verify your client/.env configuration.';
+  }
+  return message || 'Authentication failed. Please try again.';
+}
+
 export async function loginWithGoogle(): Promise<{ success: boolean; error?: string }> {
   try {
     window.localStorage.removeItem(USER_KEY);
     await signInWithPopup(auth, googleProvider);
     return { success: true };
   } catch (error: any) {
-    console.error(error);
-    return { success: false, error: error.message };
+    console.error('Google Popup Auth Error:', error);
+    
+    // If popup was blocked or failed, attempt redirect mode as fallback
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+      try {
+        await signInWithRedirect(auth, googleProvider);
+        return { success: true };
+      } catch (redirectErr: any) {
+        console.error('Google Redirect Auth Error:', redirectErr);
+        return { success: false, error: formatAuthError(redirectErr) };
+      }
+    }
+    
+    return { success: false, error: formatAuthError(error) };
   }
 }
+
 
 export async function submitAuth(email: string, password: string, name?: string): Promise<{ success: boolean; error?: string }> {
   if (!email || !email.includes('@')) {
@@ -118,6 +167,14 @@ export async function logout(): Promise<void> {
 // Observe state changes and run the callback with the active user context.
 export function registerAuthObserver(callback: (user: AppUser | null) => void) {
   authObserverCallback = callback;
+
+  // Handle redirect result if returning from Google Auth redirect
+  getRedirectResult(auth).catch((err) => {
+    if (err && err.code !== 'auth/popup-closed-by-user') {
+      console.error('Google Auth Redirect error:', err);
+    }
+  });
+
   // Check if there is an active guest session in localStorage on boot
   const guestUserVal = window.localStorage.getItem(USER_KEY);
   if (guestUserVal) {
@@ -130,6 +187,7 @@ export function registerAuthObserver(callback: (user: AppUser | null) => void) {
       }
     } catch (e) {}
   }
+
 
   // Firebase auth state change listener
   onAuthStateChanged(auth, async (firebaseUser) => {
