@@ -309,14 +309,14 @@ export default function Curriculum({
               ) : (
                 <div className="flex flex-col gap-3">
                   {subtopicProblems.map(p => (
-                    <div key={p.id} className="border-3 border-border p-4 bg-bg-surface flex justify-between items-center transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]">
+                    <div key={p.id} className="border-3 border-border p-3 sm:p-4 bg-bg-surface flex flex-col sm:flex-row justify-between sm:items-center gap-3 transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]">
                       <div>
                         <h4 className="brutal-title text-sm font-black m-0 leading-tight text-text-primary">{p.title}</h4>
                         <span className="brutal-mono text-[10px] text-text-secondary block mt-1">
                           {p.platform} · {p.pattern || 'No pattern tagged'} · {p.estimatedTime} mins est.
                         </span>
                       </div>
-                      <div className="flex gap-2 items-center">
+                      <div className="flex flex-wrap gap-2 items-center">
                         <span className={`brutal-pill text-[9px] font-black text-text-primary ${
                           p.difficulty === 'Easy' ? 'bg-accent-green' : p.difficulty === 'Medium' ? 'bg-accent-blue' : 'bg-accent-pink'
                         }`}>

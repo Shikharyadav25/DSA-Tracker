@@ -5,7 +5,8 @@ import {
   createUserWithEmailAndPassword, 
   signOut as firebaseSignOut, 
   updateProfile,
-  onAuthStateChanged
+  onAuthStateChanged,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { User } from '../types/types';
 import { USER_KEY, setCurrentUid } from './storage';
@@ -75,7 +76,32 @@ export async function submitAuth(email: string, password: string, name?: string)
       return { success: true };
     }
   } catch (error: any) {
-    return { success: false, error: error.message };
+    let msg = error.message || 'Authentication error.';
+    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+      msg = 'Invalid email/password combination. If you originally registered using Google, click "Continue with Google" above.';
+    } else if (error.code === 'auth/email-already-in-use') {
+      msg = 'An account with this email already exists. If registered via Google, click "Continue with Google" above, or Sign In with password.';
+    } else if (error.code === 'auth/weak-password') {
+      msg = 'Password should be at least 6 characters long.';
+    }
+    return { success: false, error: msg };
+  }
+}
+
+export async function resetPassword(email: string): Promise<{ success: boolean; message?: string; error?: string }> {
+  if (!email || !email.includes('@')) {
+    return { success: false, error: 'Please enter your valid email address in the Email field above.' };
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { success: true, message: `Password reset link sent to ${email}. Check your inbox!` };
+  } catch (error: any) {
+    console.error("Password reset error:", error);
+    let msg = error.message || 'Failed to send password reset email.';
+    if (error.code === 'auth/user-not-found') {
+      msg = 'No user account found with this email.';
+    }
+    return { success: false, error: msg };
   }
 }
 

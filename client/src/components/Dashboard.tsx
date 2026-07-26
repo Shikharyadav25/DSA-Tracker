@@ -92,19 +92,19 @@ export default function Dashboard({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Side: Tasks Planner */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="brutal-card p-8 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
+          <div className="brutal-card p-4 sm:p-8 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
             {/* Category colored corner tab */}
             <div className="absolute top-0 right-0 w-8 h-8 bg-accent-blue border-l-3 border-b-3 border-border"></div>
 
             <div className="flex justify-between items-center mb-6">
-              <h2 className="brutal-title text-2xl font-black m-0 text-text-primary">TODAY'S PLAN</h2>
+              <h2 className="brutal-title text-xl sm:text-2xl font-black m-0 text-text-primary">TODAY'S PLAN</h2>
               <div className="brutal-pill bg-accent-blue border-2 border-border text-text-primary font-bold text-[10px]">
                 {todayStr}
               </div>
             </div>
 
             {todayTasks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center p-10 border-3 border-dashed border-border bg-bg-surface-alt">
+              <div className="flex flex-col items-center justify-center text-center p-6 sm:p-10 border-3 border-dashed border-border bg-bg-surface-alt">
                 <Calendar className="w-10 h-10 mb-3 text-text-secondary" />
                 <h3 className="brutal-title text-base font-extrabold mb-1 text-text-primary">NO TASKS CONFIGURED TODAY</h3>
                 <p className="brutal-mono text-xs text-text-secondary max-w-[280px] mb-6">
@@ -124,7 +124,7 @@ export default function Dashboard({
                   return (
                     <div
                       key={task.id}
-                      className="border-3 border-border p-4 bg-bg-surface flex justify-between items-center transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]"
+                      className="border-3 border-border p-3 sm:p-4 bg-bg-surface flex flex-col sm:flex-row justify-between sm:items-center gap-3 transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]"
                       style={{
                         opacity: isDone || isSkipped ? 0.6 : 1,
                         borderLeftWidth: '8px',
@@ -132,7 +132,7 @@ export default function Dashboard({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="brutal-mono text-[9px] uppercase tracking-widest bg-text-primary text-bg-surface px-2 py-0.5 font-bold">
+                        <span className="brutal-mono text-[9px] uppercase tracking-widest bg-text-primary text-bg-surface px-2 py-0.5 font-bold shrink-0">
                           {task.type}
                         </span>
                         <h4 className="brutal-title text-sm font-black m-0 leading-tight text-text-primary">
@@ -141,7 +141,7 @@ export default function Dashboard({
                       </div>
 
                       {task.status === 'pending' ? (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 self-end sm:self-auto">
                           <button
                             className="brutal-btn py-1.5 px-3 text-[10px] bg-status-success text-text-primary font-black border-2 border-border"
                             onClick={() => handleTaskAction(task.id, 'completed')}
@@ -156,7 +156,7 @@ export default function Dashboard({
                           </button>
                         </div>
                       ) : (
-                        <span className="brutal-mono text-[10px] font-black uppercase tracking-wider text-text-primary flex items-center gap-1">
+                        <span className="brutal-mono text-[10px] font-black uppercase tracking-wider text-text-primary flex items-center gap-1 self-end sm:self-auto">
                           {isDone ? (
                             <>COMPLETED <Check className="w-3.5 h-3.5 text-accent-green" /></>
                           ) : (

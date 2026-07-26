@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { AppUser, registerAuthObserver, logout, loginAsGuest, loginWithGoogle, submitAuth, authMode, setAuthMode } from './services/auth';
+import { AppUser, registerAuthObserver, logout, loginAsGuest, loginWithGoogle, submitAuth, authMode, setAuthMode, resetPassword } from './services/auth';
 import { dbService } from './services/db';
 import { aiService } from './services/ai';
 import * as Types from './types/learningOS';
-import { Calendar, BookOpen, RefreshCw, Briefcase, BarChart3, Settings as SettingsIcon, Sun, Moon, AlertTriangle, Zap, Flame } from 'lucide-react';
+import { Calendar, BookOpen, RefreshCw, Briefcase, BarChart3, Settings as SettingsIcon, Sun, Moon, AlertTriangle, Zap, Flame, CheckCircle, Menu, X } from 'lucide-react';
 
 import { useLocation, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
@@ -14,10 +14,32 @@ import Analytics from './components/Analytics';
 import Settings from './components/Settings';
 import LeetLogo from './components/LeetLogo';
 
+const GoogleLogo = () => (
+  <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+    <path
+      fill="#4285F4"
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+    />
+    <path
+      fill="#EA4335"
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+    />
+  </svg>
+);
+
 export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
-  const [authTab, setAuthTab] = useState<'login' | 'signup'>('login');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -163,18 +185,50 @@ export default function App() {
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setAuthInfo(null);
+    setAuthLoading(true);
     setAuthMode(authTab);
-    const res = await submitAuth(email, password, name);
-    if (!res.success) {
-      setAuthError(res.error || 'Authentication error.');
+    try {
+      const res = await submitAuth(email, password, name);
+      if (!res.success) {
+        setAuthError(res.error || 'Authentication error.');
+      }
+    } finally {
+      setAuthLoading(false);
     }
   };
 
   const handleGoogleAuth = async () => {
     setAuthError(null);
-    const res = await loginWithGoogle();
-    if (!res.success) {
-      setAuthError(res.error || 'Google login failed.');
+    setAuthInfo(null);
+    setAuthLoading(true);
+    try {
+      const res = await loginWithGoogle();
+      if (!res.success) {
+        setAuthError(res.error || 'Google login failed.');
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setAuthError(null);
+    setAuthInfo(null);
+    if (!email || !email.includes('@')) {
+      setAuthError('Please enter your email address first, then click "Forgot Password?".');
+      return;
+    }
+    setAuthLoading(true);
+    try {
+      const res = await resetPassword(email);
+      if (res.success) {
+        setAuthInfo(res.message || 'Password reset link sent to your email.');
+      } else {
+        setAuthError(res.error || 'Failed to send reset link.');
+      }
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -383,81 +437,26 @@ export default function App() {
             <p className="brutal-mono uppercase text-xs tracking-wider text-text-secondary">Autonomous LeetCode & SDE Tracker</p>
           </div>
 
-          <div className="auth-toggle w-full flex border-3 border-border mb-6 overflow-hidden">
-            <button
-              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer ${authTab === 'login' ? 'bg-accent-primary' : 'bg-white'}`}
-              style={{ color: authTab === 'login' ? '#FFFFFF' : '#141414', backgroundColor: authTab === 'login' ? '#4A9FD8' : '#FFFFFF' }}
-              onClick={() => setAuthTab('login')}
-            >
-              Sign In
-            </button>
-            <button
-              className={`flex-1 py-3 text-sm font-extrabold brutal-title uppercase cursor-pointer border-l-3 border-border ${authTab === 'signup' ? 'bg-accent-primary' : 'bg-white'}`}
-              style={{ color: authTab === 'signup' ? '#FFFFFF' : '#141414', backgroundColor: authTab === 'signup' ? '#4A9FD8' : '#FFFFFF' }}
-              onClick={() => setAuthTab('signup')}
-            >
-              Sign Up
-            </button>
-          </div>
-
-          <button className="google-btn w-full py-3 brutal-btn brutal-btn-accent text-white mb-4 text-sm" onClick={handleGoogleAuth}>
-            Continue with Google
-          </button>
-
-          <div className="divider w-full flex items-center justify-center gap-3 brutal-title text-[10px] text-text-secondary mb-4 uppercase">
-            or use email
-          </div>
-
           {authError && (
-            <div className="w-full brutal-card p-3 bg-status-danger text-text-primary font-bold text-xs mb-4 border-2 border-border flex items-center gap-2">
+            <div className="w-full brutal-card p-3 bg-status-danger text-text-primary font-bold text-xs mb-6 border-2 border-border flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-accent-red shrink-0" />
               <span>{authError}</span>
             </div>
           )}
 
-          <form onSubmit={handleAuthSubmit} className="w-full flex flex-col gap-4">
-            {authTab === 'signup' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-wide text-text-primary">Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="ADA LOVELACE"
-                  className="brutal-input text-xs"
-                  required
-                />
-              </div>
-            )}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-wide text-text-primary">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="NAME@EXAMPLE.COM"
-                className="brutal-input text-xs"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-wide text-text-primary">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="******"
-                className="brutal-input text-xs"
-                required
-              />
-            </div>
-            <button type="submit" className="w-full brutal-btn brutal-btn-primary py-3.5 text-sm mt-2">
-              {authTab === 'login' ? 'Confirm Sign In' : 'Create Account'}
-            </button>
-          </form>
+          <button 
+            type="button"
+            disabled={authLoading}
+            className="google-btn w-full py-4 brutal-btn bg-white hover:bg-slate-50 text-text-primary mb-4 text-sm font-black brutal-title flex items-center justify-center gap-3 shadow-[4px_4px_0px_var(--shadow-color)] border-3 border-border cursor-pointer transition-all active:translate-x-[2px] active:translate-y-[2px]" 
+            onClick={handleGoogleAuth}
+          >
+            <GoogleLogo />
+            <span>{authLoading ? 'CONNECTING...' : 'CONTINUE WITH GOOGLE'}</span>
+          </button>
 
           <button
-            className="w-full brutal-btn py-3 mt-3 text-xs"
+            type="button"
+            className="w-full brutal-btn py-3 text-xs brutal-mono font-bold uppercase cursor-pointer"
             onClick={loginAsGuest}
           >
             Guest Sandbox (Offline)
@@ -471,9 +470,47 @@ export default function App() {
   // Main App Shell (Sidebar + Content layout pattern)
   // -------------------------------------------------------------
   return (
-    <div className="flex min-h-screen bg-bg-canvas text-text-primary">
-      {/* Fixed Sidebar Layout */}
-      <aside className="w-[280px] border-r-3 border-border bg-bg-surface flex flex-col justify-between flex-shrink-0">
+    <div className="flex flex-col md:flex-row min-h-screen bg-bg-canvas text-text-primary relative overflow-x-hidden">
+      {/* Mobile Top Header Bar */}
+      <header className="md:hidden sticky top-0 z-40 bg-bg-surface border-b-3 border-border p-3 px-4 flex items-center justify-between shadow-md">
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="brutal-btn p-2 text-text-primary cursor-pointer"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+          <div className="w-8 h-8 border-2 border-border bg-[#1A1A1A] text-white flex items-center justify-center flex-shrink-0 rounded-md">
+            <LeetLogo className="w-5 h-5" />
+          </div>
+          <span className="brutal-title text-sm font-black text-text-primary">LEET TRACK</span>
+        </div>
+
+        <button
+          className="theme-toggle-btn brutal-btn w-9 h-9 p-0 flex items-center justify-center flex-shrink-0"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+        </button>
+      </header>
+
+      {/* Mobile Backdrop Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 z-40 transition-opacity"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Layout (Drawer on Mobile, Static on Desktop) */}
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-50 w-[280px] border-r-3 border-border bg-bg-surface flex flex-col justify-between flex-shrink-0 transition-transform duration-200 ease-in-out ${
+          mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
         <div>
           {/* Top Header Block */}
           <div className="sidebar-header bg-bg-surface p-4 px-5 border-b-3 border-border flex items-center justify-between gap-2">
@@ -487,7 +524,7 @@ export default function App() {
               </div>
             </div>
             <button
-              className="theme-toggle-btn brutal-btn w-9 h-9 p-0 flex items-center justify-center flex-shrink-0"
+              className="hidden md:flex theme-toggle-btn brutal-btn w-9 h-9 p-0 items-center justify-center flex-shrink-0"
               onClick={toggleTheme}
               aria-label="Toggle theme"
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -511,7 +548,10 @@ export default function App() {
               return (
                 <button
                   key={item.id}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => {
+                    navigate(item.path);
+                    setMobileMenuOpen(false);
+                  }}
                   className={`w-full text-left py-3.5 px-4 brutal-title text-xs font-black uppercase transition-all duration-75 cursor-pointer brutal-btn flex items-center gap-2.5 ${
                     isActive ? 'bg-accent-primary text-white shadow-[0px_0px_0px_var(--shadow-color)] translate-x-[3px] translate-y-[3px]' : 'bg-bg-surface text-text-primary'
                   }`}
@@ -527,12 +567,24 @@ export default function App() {
         {/* Sidebar bottom block */}
         <div className="p-4 border-t-3 border-border bg-bg-surface flex flex-col gap-3">
           {/* Active safety / Reset CTA */}
-          <button className="w-full py-3 brutal-btn brutal-btn-accent text-xs flex items-center justify-center gap-1.5" onClick={generateWeeklyPlan}>
+          <button 
+            className="w-full py-3 brutal-btn brutal-btn-accent text-xs flex items-center justify-center gap-1.5" 
+            onClick={() => {
+              generateWeeklyPlan();
+              setMobileMenuOpen(false);
+            }}
+          >
             <Zap className="w-4 h-4 shrink-0" />
             <span>GENERATE AUTOPILOT PLAN</span>
           </button>
           
-          <button className="w-full py-2.5 brutal-btn text-xs" onClick={logout}>
+          <button 
+            className="w-full py-2.5 brutal-btn text-xs" 
+            onClick={() => {
+              logout();
+              setMobileMenuOpen(false);
+            }}
+          >
             EXIT PORTAL
           </button>
 
@@ -551,9 +603,9 @@ export default function App() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 min-h-screen p-8 bg-bg-canvas brutal-grid-paper overflow-y-auto relative">
+      <main className="flex-1 min-w-0 min-h-screen p-4 sm:p-6 md:p-8 bg-bg-canvas brutal-grid-paper overflow-y-auto relative">
         <button
-          className="theme-toggle-btn absolute top-6 right-8 brutal-btn w-10 h-10 p-0 z-30 flex items-center justify-center"
+          className="hidden md:flex theme-toggle-btn absolute top-6 right-8 brutal-btn w-10 h-10 p-0 z-30 items-center justify-center"
           onClick={toggleTheme}
           aria-label="Toggle theme"
           title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
