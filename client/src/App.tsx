@@ -5,13 +5,14 @@ import { aiService } from './services/ai';
 import * as Types from './types/learningOS';
 import { Calendar, BookOpen, RefreshCw, Briefcase, BarChart3, Settings as SettingsIcon, Sun, Moon, AlertTriangle, Zap, Flame } from 'lucide-react';
 
-// Component Views
+import { useLocation, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Curriculum from './components/Curriculum';
 import Revision from './components/Revision';
 import InterviewPrep from './components/InterviewPrep';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
+import LeetLogo from './components/LeetLogo';
 
 export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
@@ -21,8 +22,16 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  // Primary OS Collections
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSetActiveTab = (tab: string) => {
+    if (tab === 'dashboard') {
+      navigate('/');
+    } else {
+      navigate(`/${tab}`);
+    }
+  };
   const [tracks, setTracks] = useState<Types.LearningTrack[]>([]);
   const [topics, setTopics] = useState<Types.Topic[]>([]);
   const [subtopics, setSubtopics] = useState<Types.Subtopic[]>([]);
@@ -341,7 +350,7 @@ export default function App() {
     if (confirm('Verify reset. This deletes all database progress.')) {
       await dbService.resetAndSeedAll();
       loadOSData();
-      setActiveTab('dashboard');
+      navigate('/');
     }
   };
 
@@ -354,7 +363,7 @@ export default function App() {
         <div className="relative brutal-card max-w-[420px] w-full p-10 bg-bg-white flex flex-col items-center">
           {/* Tagline stickers rotated */}
           <div className="absolute -top-4 -left-4 brutal-sticker">
-            curriculum OS
+            leet track OS
           </div>
 
           <button
@@ -366,14 +375,12 @@ export default function App() {
           </button>
 
           <div className="w-full flex flex-col items-center mb-8 mt-4 text-center">
-            {/* Square Logo Swatch */}
-            <div className="w-14 h-14 border-3 border-border shadow-[4px_4px_0px_var(--shadow-color)] bg-accent-primary text-white flex items-center justify-center mb-4">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-7 h-7">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-              </svg>
+            {/* Square Logo Swatch with LeetCode styling */}
+            <div className="w-14 h-14 border-3 border-border shadow-[4px_4px_0px_var(--shadow-color)] bg-[#1A1A1A] text-white flex items-center justify-center mb-4 rounded-lg">
+              <LeetLogo className="w-8 h-8" />
             </div>
-            <h1 className="brutal-title text-3xl leading-none font-extrabold mb-1 text-text-primary">LEARNING OS</h1>
-            <p className="brutal-mono uppercase text-xs tracking-wider text-text-secondary">Autonomous study coordinator</p>
+            <h1 className="brutal-title text-3xl leading-none font-extrabold mb-1 text-text-primary">LEET TRACK</h1>
+            <p className="brutal-mono uppercase text-xs tracking-wider text-text-secondary">Autonomous LeetCode & SDE Tracker</p>
           </div>
 
           <div className="auth-toggle w-full flex border-3 border-border mb-6 overflow-hidden">
@@ -471,13 +478,11 @@ export default function App() {
           {/* Top Header Block */}
           <div className="sidebar-header bg-bg-surface p-4 px-5 border-b-3 border-border flex items-center justify-between gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 border-2 border-border bg-accent-primary text-white flex items-center justify-center flex-shrink-0">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                </svg>
+              <div className="w-10 h-10 border-2 border-border bg-[#1A1A1A] text-white flex items-center justify-center flex-shrink-0 rounded-md">
+                <LeetLogo className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="brutal-title text-base leading-none font-black text-text-primary m-0">LEARNING OS</h2>
+                <h2 className="brutal-title text-base leading-none font-black text-text-primary m-0">LEET TRACK</h2>
                 <span className="brutal-mono text-[9px] uppercase tracking-wider text-text-secondary font-bold">AUTOPILOT SDE MENTOR</span>
               </div>
             </div>
@@ -494,19 +499,19 @@ export default function App() {
           {/* Navigation Items Stacked */}
           <nav className="p-4 flex flex-col gap-3">
             {[
-              { id: 'dashboard', label: 'Plan Board', icon: Calendar },
-              { id: 'curriculum', label: 'Curriculum', icon: BookOpen },
-              { id: 'revision', label: 'Revision SR', icon: RefreshCw },
-              { id: 'interview', label: 'Interview', icon: Briefcase },
-              { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-              { id: 'settings', label: 'Settings', icon: SettingsIcon }
+              { id: 'dashboard', path: '/', label: 'Plan Board', icon: Calendar },
+              { id: 'curriculum', path: '/curriculum', label: 'Curriculum', icon: BookOpen },
+              { id: 'revision', path: '/revision', label: 'Revision SR', icon: RefreshCw },
+              { id: 'interview', path: '/interview', label: 'Interview', icon: Briefcase },
+              { id: 'analytics', path: '/analytics', label: 'Analytics', icon: BarChart3 },
+              { id: 'settings', path: '/settings', label: 'Settings', icon: SettingsIcon }
             ].map(item => {
-              const isActive = activeTab === item.id;
+              const isActive = location.pathname === item.path || (item.path === '/' && location.pathname === '/dashboard');
               const IconComp = item.icon;
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => navigate(item.path)}
                   className={`w-full text-left py-3.5 px-4 brutal-title text-xs font-black uppercase transition-all duration-75 cursor-pointer brutal-btn flex items-center gap-2.5 ${
                     isActive ? 'bg-accent-primary text-white shadow-[0px_0px_0px_var(--shadow-color)] translate-x-[3px] translate-y-[3px]' : 'bg-bg-surface text-text-primary'
                   }`}
@@ -555,64 +560,86 @@ export default function App() {
         >
           {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
         </button>
-        {activeTab === 'dashboard' && (
-          <Dashboard
-            dailyTasks={dailyTasks}
-            weeklyPlans={weeklyPlans}
-            preferences={preferences}
-            streak={streaks?.currentStreak || 0}
-            generateWeeklyPlan={generateWeeklyPlan}
-            handleTaskAction={handleTaskAction}
-            setActiveTab={setActiveTab}
-            problems={problems}
-            skills={skills}
-            insights={aiInsights}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Dashboard
+                dailyTasks={dailyTasks}
+                weeklyPlans={weeklyPlans}
+                preferences={preferences}
+                streak={streaks?.currentStreak || 0}
+                generateWeeklyPlan={generateWeeklyPlan}
+                handleTaskAction={handleTaskAction}
+                setActiveTab={handleSetActiveTab}
+                problems={problems}
+                skills={skills}
+                insights={aiInsights}
+              />
+            }
           />
-        )}
-        {activeTab === 'curriculum' && (
-          <Curriculum
-            tracks={tracks}
-            topics={topics}
-            subtopics={subtopics}
-            problems={problems}
-            saveProblem={saveProblem}
-            deleteProblem={deleteProblem}
+          <Route path="/dashboard" element={<Navigate to="/" replace />} />
+          <Route
+            path="/curriculum"
+            element={
+              <Curriculum
+                tracks={tracks}
+                topics={topics}
+                subtopics={subtopics}
+                problems={problems}
+                saveProblem={saveProblem}
+                deleteProblem={deleteProblem}
+              />
+            }
           />
-        )}
-        {activeTab === 'revision' && (
-          <Revision
-            problems={problems}
-            saveProblem={saveProblem}
+          <Route
+            path="/revision"
+            element={
+              <Revision
+                problems={problems}
+                saveProblem={saveProblem}
+              />
+            }
           />
-        )}
-        {activeTab === 'interview' && (
-          <InterviewPrep
-            interviewTracks={interviewTracks}
-            dailyTasks={dailyTasks}
-            handleTaskAction={handleTaskAction}
+          <Route
+            path="/interview"
+            element={
+              <InterviewPrep
+                interviewTracks={interviewTracks}
+                dailyTasks={dailyTasks}
+                handleTaskAction={handleTaskAction}
+              />
+            }
           />
-        )}
-        {activeTab === 'analytics' && (
-          <Analytics
-            problems={problems}
-            skills={skills}
-            projects={projects}
-            dailyTasks={dailyTasks}
-            contests={contests}
-            contestAttempts={contestAttempts}
-            setContestAttempts={setContestAttempts}
-            userId={user.uid}
+          <Route
+            path="/analytics"
+            element={
+              <Analytics
+                problems={problems}
+                skills={skills}
+                projects={projects}
+                dailyTasks={dailyTasks}
+                contests={contests}
+                contestAttempts={contestAttempts}
+                setContestAttempts={setContestAttempts}
+                userId={user.uid}
+              />
+            }
           />
-        )}
-        {activeTab === 'settings' && (
-          <Settings
-            preferences={preferences}
-            savePrefs={savePreferences}
-            triggerReset={triggerReset}
-            theme={theme}
-            toggleTheme={toggleTheme}
+          <Route
+            path="/settings"
+            element={
+              <Settings
+                preferences={preferences}
+                savePrefs={savePreferences}
+                triggerReset={triggerReset}
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            }
           />
-        )}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
     </div>
   );

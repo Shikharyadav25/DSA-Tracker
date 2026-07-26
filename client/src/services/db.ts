@@ -405,7 +405,7 @@ export function getSeedSkills(): Types.Skill[] {
 
 export function getSeedProjects(): Types.Project[] {
   return [
-    { id: 'proj-learning-os', userId: 'guest', name: 'Clean Architecture Learning OS', description: 'An automated SDE mentoring Operating System with scheduler backends.', status: 'In Progress', priority: 'High', weekCommitment: 10, githubUrl: 'https://github.com/Shikharyadav25/DSA-Tracker', completionPercentage: 40 }
+    { id: 'proj-leet-track', userId: 'guest', name: 'Clean Architecture Leet Track Platform', description: 'An automated SDE & LeetCode mentoring Operating System with scheduler backends.', status: 'In Progress', priority: 'High', weekCommitment: 10, githubUrl: 'https://github.com/Shikharyadav25/DSA-Tracker', completionPercentage: 40 }
   ];
 }
 
