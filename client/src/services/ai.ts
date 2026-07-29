@@ -67,13 +67,14 @@ export const aiService = {
     subtopics: Types.Subtopic[],
     problems: Types.Problem[],
     skills: Types.Skill[],
-    projects: Types.Project[]
+    projects: Types.Project[],
+    surveyParams?: any
   ): Promise<any> {
     try {
       const response = await fetch('/api/scheduler/generate-weekly', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, preferences, tracks, topics, subtopics, problems, skills, projects })
+        body: JSON.stringify({ userId, preferences, tracks, topics, subtopics, problems, skills, projects, surveyParams })
       });
       if (!response.ok) throw new Error('API failure');
       return await response.json();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LearningTrack, Topic, Subtopic, Problem } from '../types/learningOS';
-import { BookOpen, Server, Rocket, Brain, Cpu, FileText, ExternalLink, X, Settings } from 'lucide-react';
+import { LearningTrack, Topic, Subtopic, Problem, Notes } from '../types/learningOS';
+import { BookOpen, Server, Rocket, Brain, Cpu, FileText, ExternalLink, X, Settings, Edit3 } from 'lucide-react';
 
 interface CurriculumProps {
   tracks: LearningTrack[];
@@ -9,6 +9,8 @@ interface CurriculumProps {
   problems: Problem[];
   saveProblem: (problem: Problem) => Promise<void>;
   deleteProblem: (id: string) => Promise<void>;
+  notes: Notes[];
+  saveNote: (note: Notes) => Promise<void>;
 }
 
 export default function Curriculum({
@@ -17,11 +19,17 @@ export default function Curriculum({
   subtopics,
   problems,
   saveProblem,
-  deleteProblem
+  deleteProblem,
+  notes = [],
+  saveNote
 }: CurriculumProps) {
   const [activeTrack, setActiveTrack] = useState('dsa');
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const [activeSubtopic, setActiveSubtopic] = useState<string | null>(null);
+
+  // Status & Note editor states
+  const [editingProblemId, setEditingProblemId] = useState<string | null>(null);
+  const [problemNoteText, setProblemNoteText] = useState('');
 
   // Forms state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -309,32 +317,172 @@ export default function Curriculum({
               ) : (
                 <div className="flex flex-col gap-3">
                   {subtopicProblems.map(p => (
-                    <div key={p.id} className="border-3 border-border p-3 sm:p-4 bg-bg-surface flex flex-col sm:flex-row justify-between sm:items-center gap-3 transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]">
-                      <div>
-                        <h4 className="brutal-title text-sm font-black m-0 leading-tight text-text-primary">{p.title}</h4>
-                        <span className="brutal-mono text-[10px] text-text-secondary block mt-1">
-                          {p.platform} · {p.pattern || 'No pattern tagged'} · {p.estimatedTime} mins est.
-                        </span>
+                    <div key={p.id} className="border-3 border-border p-3 sm:p-4 bg-bg-surface flex flex-col gap-3 transition-all duration-75 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_var(--shadow-color)]">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div
+                          className="cursor-pointer flex-1"
+                          onClick={() => {
+                            if (editingProblemId === p.id) {
+                              setEditingProblemId(null);
+                            } else {
+                              setEditingProblemId(p.id);
+                              setProblemNoteText('');
+                            }
+                          }}
+                        >
+                          <h4 className="brutal-title text-sm font-black m-0 leading-tight text-text-primary hover:text-accent-blue">{p.title}</h4>
+                          <span className="brutal-mono text-[10px] text-text-secondary block mt-1">
+                            {p.platform} · {p.pattern || 'No pattern tagged'}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <span className={`brutal-pill text-[9px] font-black text-text-primary ${
+                            p.difficulty === 'Easy' ? 'bg-accent-green' : p.difficulty === 'Medium' ? 'bg-accent-blue' : 'bg-accent-pink'
+                          }`}>
+                            {p.difficulty}
+                          </span>
+                          <button
+                            onClick={() => {
+                              if (editingProblemId === p.id) {
+                                setEditingProblemId(null);
+                              } else {
+                                setEditingProblemId(p.id);
+                                setProblemNoteText('');
+                              }
+                            }}
+                            className="brutal-pill bg-bg-surface-alt border-border text-[9px] font-black text-text-primary hover:bg-accent-blue cursor-pointer flex items-center gap-1"
+                          >
+                            <span>{p.status}</span>
+                            <span>▾</span>
+                          </button>
+                          {p.link && (
+                            <a href={p.link} target="_blank" rel="noopener noreferrer" className="brutal-btn py-1 px-3 text-[10px] border-2 border-border text-text-primary flex items-center gap-1">
+                              <span>SOLVE</span>
+                              <ExternalLink className="w-3 h-3 shrink-0" />
+                            </a>
+                          )}
+                          <button onClick={() => deleteProblem(p.id)} className="text-status-danger hover:text-accent-red font-bold text-sm cursor-pointer ml-1 p-1">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <span className={`brutal-pill text-[9px] font-black text-text-primary ${
-                          p.difficulty === 'Easy' ? 'bg-accent-green' : p.difficulty === 'Medium' ? 'bg-accent-blue' : 'bg-accent-pink'
-                        }`}>
-                          {p.difficulty}
-                        </span>
-                        <span className="brutal-pill bg-bg-surface-alt border-border text-[9px] font-black text-text-primary">
-                          {p.status}
-                        </span>
-                        {p.link && (
-                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="brutal-btn py-1 px-3 text-[10px] border-2 border-border text-text-primary flex items-center gap-1">
-                            <span>SOLVE</span>
-                            <ExternalLink className="w-3 h-3 shrink-0" />
-                          </a>
-                        )}
-                        <button onClick={() => deleteProblem(p.id)} className="text-status-danger hover:text-accent-red font-bold text-sm cursor-pointer ml-1 p-1">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
+
+                      {editingProblemId === p.id && (() => {
+                        const problemNotes = notes.filter(n => n.itemId === p.id).sort((a, b) => b.updatedAt - a.updatedAt);
+                        return (
+                          <div className="border-t-2 border-border pt-3 mt-1 flex flex-col gap-3">
+                            {/* Status Picker Row */}
+                            <div className="flex flex-col gap-1.5">
+                              <span className="brutal-mono text-[9px] uppercase font-bold text-text-secondary">Update Status:</span>
+                              <div className="flex flex-wrap gap-1.5">
+                                {(['New', 'Reading', 'Attempting', 'Hint used', 'Solved'] as Problem['status'][]).map(status => (
+                                  <button
+                                    key={status}
+                                    onClick={async () => {
+                                      const updated = { ...p, status };
+                                      if (status !== 'Solved') {
+                                        updated.nextReview = null;
+                                        updated.lastSolved = null;
+                                      }
+                                      await saveProblem(updated);
+                                    }}
+                                    className={`py-1 px-2.5 border-2 border-border brutal-title text-[9px] font-black transition-all ${
+                                      p.status === status ? 'bg-accent-blue text-text-primary' : 'bg-bg-surface hover:bg-bg-surface-alt'
+                                    }`}
+                                  >
+                                    {status}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Spaced Repetition Rating */}
+                            <div className="flex flex-col gap-1.5 border-t border-border pt-3">
+                              <span className="brutal-mono text-[9px] uppercase font-bold text-text-secondary">Log Solve / Spaced Repetition Rating:</span>
+                              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                {[
+                                  { score: 1, label: 'Forgot', desc: '1 Day', color: 'bg-status-danger text-text-primary' },
+                                  { score: 2, label: 'Hard', desc: '3 Days', color: 'bg-accent-orange text-text-primary' },
+                                  { score: 3, label: 'Good', desc: '7 Days', color: 'bg-accent-blue text-text-primary' },
+                                  { score: 4, label: 'Easy', desc: '14 Days', color: 'bg-accent-purple text-text-primary' },
+                                  { score: 5, label: 'Mastered', desc: '30+ Days', color: 'bg-status-success text-text-primary' }
+                                ].map(r => (
+                                  <button
+                                    key={r.score}
+                                    onClick={async () => {
+                                      const intervalDaysMap: Record<number, number> = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30 };
+                                      const days = intervalDaysMap[r.score] || 7;
+                                      const nextReviewTs = Date.now() + days * 24 * 60 * 60 * 1000;
+                                      const currentBox = p.box || 1;
+                                      const nextBox = r.score >= 3 ? Math.min(5, currentBox + 1) : 1;
+
+                                      const updated: Problem = {
+                                        ...p,
+                                        status: 'Solved',
+                                        box: nextBox,
+                                        interval: days,
+                                        nextReview: nextReviewTs,
+                                        lastSolved: Date.now()
+                                      };
+                                      await saveProblem(updated);
+                                    }}
+                                    className={`brutal-btn py-1 px-1.5 border-2 border-border text-[9px] font-black flex flex-col items-center justify-center leading-none ${r.color}`}
+                                  >
+                                    <span className="font-extrabold text-[9px]">{r.label}</span>
+                                    <span className="text-[7px] opacity-90 mt-0.5">{r.desc}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Timed Notes Logger */}
+                            <div className="flex flex-col gap-2 border-t border-border pt-3">
+                              <span className="brutal-mono text-[9px] uppercase font-bold text-text-secondary">Problem Study Notes:</span>
+                              
+                              {problemNotes.length > 0 && (
+                                <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto border-2 border-border p-2 bg-bg-surface-alt">
+                                  {problemNotes.map(n => (
+                                    <div key={n.id} className="text-[10px] brutal-mono text-text-primary border-b border-border pb-1 last:border-b-0">
+                                      <div className="text-[8px] font-black uppercase text-accent-pink mb-0.5">
+                                        {new Date(n.updatedAt).toLocaleString()}
+                                      </div>
+                                      <p className="m-0 leading-normal whitespace-pre-wrap">{n.content}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              <div className="flex gap-2">
+                                <textarea
+                                  value={problemNoteText}
+                                  onChange={e => setProblemNoteText(e.target.value)}
+                                  placeholder="Write a study note..."
+                                  rows={2}
+                                  className="brutal-input flex-1 text-[10px]"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    if (!problemNoteText.trim()) return;
+                                    const newNote: Notes = {
+                                      id: 'n-' + Date.now().toString(36),
+                                      userId: 'guest',
+                                      itemId: p.id,
+                                      content: problemNoteText.trim(),
+                                      updatedAt: Date.now()
+                                    };
+                                    await saveNote(newNote);
+                                    setProblemNoteText('');
+                                  }}
+                                  className="brutal-btn py-2 px-3 text-[10px] bg-accent-pink text-text-primary font-black"
+                                >
+                                  SAVE
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   ))}
                 </div>

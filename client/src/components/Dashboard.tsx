@@ -14,6 +14,7 @@ interface DashboardProps {
   problems: Problem[];
   skills: Skill[];
   insights: AIInsight[];
+  openSurveyModal?: () => void;
 }
 
 interface ChatMessage {
@@ -29,12 +30,29 @@ export default function Dashboard({
   generateWeeklyPlan,
   handleTaskAction,
   setActiveTab,
-  problems,
+  problems = [],
   skills,
-  insights
+  insights,
+  openSurveyModal
 }: DashboardProps) {
   const todayStr = new Date().toISOString().split('T')[0];
   const todayTasks = dailyTasks.filter(t => t.date === todayStr);
+
+  // Solved Stats calculation
+  const totalProblems = problems.length;
+  const solvedProblems = problems.filter(p => p.status === 'Solved');
+
+  const easyProblems = problems.filter(p => p.difficulty === 'Easy');
+  const easySolved = easyProblems.filter(p => p.status === 'Solved').length;
+  const easyTotal = easyProblems.length;
+
+  const medProblems = problems.filter(p => p.difficulty === 'Medium');
+  const medSolved = medProblems.filter(p => p.status === 'Solved').length;
+  const medTotal = medProblems.length;
+
+  const hardProblems = problems.filter(p => p.difficulty === 'Hard');
+  const hardSolved = hardProblems.filter(p => p.status === 'Solved').length;
+  const hardTotal = hardProblems.length;
 
   // AI Insights state
   const [aiReport, setAiReport] = useState<any>(null);
@@ -198,6 +216,57 @@ export default function Dashboard({
 
         {/* Right Side: Streaks, Mentor Advice & Diagnostic summary */}
         <div className="lg:col-span-4 flex flex-col gap-6">
+          {/* LeetCode-Style Solved Progress Tracker */}
+          <div className="brutal-card p-6 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
+            <div className="absolute top-0 right-0 w-8 h-8 bg-accent-green border-l-3 border-b-3 border-border"></div>
+            <h3 className="brutal-title text-base font-black mb-3 text-text-primary">CURRICULUM PROGRESS</h3>
+            
+            <div className="flex items-center gap-5 mb-4">
+              <div className="relative w-16 h-16 flex flex-col items-center justify-center border-3 border-border rounded-full bg-bg-surface-alt shadow-[3px_3px_0px_var(--shadow-color)] shrink-0">
+                <span className="brutal-title text-sm font-black text-text-primary leading-none">
+                  {totalProblems > 0 ? Math.round((solvedProblems.length / totalProblems) * 100) : 0}%
+                </span>
+                <span className="text-[7px] font-black uppercase text-text-secondary mt-0.5">Solved</span>
+              </div>
+              <div className="flex-1">
+                <div className="brutal-title text-lg font-black text-text-primary leading-none">{solvedProblems.length} / {totalProblems}</div>
+                <div className="brutal-mono text-[9px] font-bold uppercase text-text-secondary mt-1">Syllabus Problems</div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 pt-2 border-t-2 border-border brutal-mono text-[10px]">
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-accent-green font-extrabold uppercase">Easy</span>
+                  <span className="font-bold text-text-primary">{easySolved} / {easyTotal}</span>
+                </div>
+                <div className="w-full bg-bg-surface-alt border-2 border-border h-2">
+                  <div className="bg-accent-green h-full" style={{ width: `${easyTotal > 0 ? (easySolved / easyTotal) * 100 : 0}%` }}></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-accent-blue font-extrabold uppercase">Medium</span>
+                  <span className="font-bold text-text-primary">{medSolved} / {medTotal}</span>
+                </div>
+                <div className="w-full bg-bg-surface-alt border-2 border-border h-2">
+                  <div className="bg-accent-blue h-full" style={{ width: `${medTotal > 0 ? (medSolved / medTotal) * 100 : 0}%` }}></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-accent-pink font-extrabold uppercase">Hard</span>
+                  <span className="font-bold text-text-primary">{hardSolved} / {hardTotal}</span>
+                </div>
+                <div className="w-full bg-bg-surface-alt border-2 border-border h-2">
+                  <div className="bg-accent-pink h-full" style={{ width: `${hardTotal > 0 ? (hardSolved / hardTotal) * 100 : 0}%` }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Consistency Streak */}
           <div className="brutal-card p-6 border-3 border-border shadow-[6px_6px_0px_var(--shadow-color)] bg-bg-surface relative">
             <div className="absolute top-0 right-0 w-8 h-8 bg-accent-orange border-l-3 border-b-3 border-border"></div>

@@ -89,6 +89,14 @@ body.dark-mode {
   box-sizing: border-box;
 }
 
+/* Explicit background utility classes matching design tokens */
+.bg-bg-surface {
+  background-color: var(--bg-surface) !important;
+}
+.bg-bg-surface-alt {
+  background-color: var(--bg-surface-alt) !important;
+}
+
 body {
   background-color: var(--bg-canvas);
   color: var(--text-primary);

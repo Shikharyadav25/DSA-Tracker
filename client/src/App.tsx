@@ -13,6 +13,7 @@ import InterviewPrep from './components/InterviewPrep';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
 import LeetLogo from './components/LeetLogo';
+import StudyPlanSurveyModal, { SurveyParams } from './components/StudyPlanSurveyModal';
 
 const GoogleLogo = () => (
   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -73,6 +74,7 @@ export default function App() {
   const [taskCompletions, setTaskCompletions] = useState<Types.TaskCompletion[]>([]);
   const [contests, setContests] = useState<Types.Contest[]>([]);
   const [contestAttempts, setContestAttempts] = useState<Types.ContestAttempt[]>([]);
+  const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [notes, setNotes] = useState<Types.Notes[]>([]);
   const [bookmarks, setBookmarks] = useState<Types.Bookmarks[]>([]);
   const [aiInsights, setAiInsights] = useState<Types.AIInsight[]>([]);
@@ -151,18 +153,46 @@ export default function App() {
       setProblemAttempts(dbAttempts);
       setRevisionHistory(dbHistory);
 
+      // 1. Everyday Visit Streak Engine (LeetCode style)
+      const todayStr = new Date().toISOString().split('T')[0];
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+      let streakObj: Types.Streak;
       if (dbStreak.length > 0) {
-        setStreaks(dbStreak[0]);
+        streakObj = { ...dbStreak[0] };
+        if (streakObj.lastActiveDate !== todayStr) {
+          if (streakObj.lastActiveDate === yesterdayStr) {
+            const nextVal = (streakObj.currentStreak || 0) + 1;
+            streakObj.currentStreak = nextVal;
+            streakObj.maxStreak = Math.max(streakObj.maxStreak || 0, nextVal);
+          } else if (!streakObj.lastActiveDate) {
+            streakObj.currentStreak = 1;
+            streakObj.maxStreak = Math.max(streakObj.maxStreak || 0, 1);
+          } else {
+            // Missed a day: reset streak to 1
+            streakObj.currentStreak = 1;
+          }
+          streakObj.lastActiveDate = todayStr;
+          await dbService.saveDoc('streaks', streakObj.id, streakObj);
+        }
       } else {
-        const initStreak: Types.Streak = {
+        streakObj = {
           id: `streak-${user.uid}`,
           userId: user.uid,
-          currentStreak: 0,
-          maxStreak: 0,
-          lastActiveDate: ''
+          currentStreak: 1,
+          maxStreak: 1,
+          lastActiveDate: todayStr
         };
-        await dbService.saveDoc('streaks', initStreak.id, initStreak);
-        setStreaks(initStreak);
+        await dbService.saveDoc('streaks', streakObj.id, streakObj);
+      }
+      setStreaks(streakObj);
+
+      // 2. First Visit of the Day Survey Trigger
+      const lastSurveyDate = localStorage.getItem(`survey_date_${user.uid}`);
+      if (lastSurveyDate !== todayStr) {
+        setShowSurveyModal(true);
       }
 
       if (dbPrefs.length > 0) {
@@ -175,7 +205,7 @@ export default function App() {
           studyDays: [1, 2, 3, 4, 5, 6, 0],
           wakeTime: '08:00',
           intensity: 'balanced',
-          collegeWorkload: 'Low'
+ collegeWorkload: 'Low'
         };
         await dbService.saveDoc('preferences', user.uid, initPrefs);
         setPreferences(initPrefs);
@@ -255,6 +285,14 @@ export default function App() {
     await dbService.deleteDoc('problems', id);
   };
 
+  const saveNote = async (note: Types.Notes) => {
+    const updated = [...notes];
+    const idx = updated.findIndex(n => n.id === note.id);
+    if (idx > -1) updated[idx] = note; else updated.push(note);
+    setNotes(updated);
+    await dbService.saveDoc('notes', note.id, note);
+  };
+
   const saveSkill = async (skill: Types.Skill) => {
     const updated = [...skills];
     const idx = updated.findIndex(s => s.id === skill.id);
@@ -281,8 +319,11 @@ export default function App() {
     await dbService.saveDoc('preferences', user!.uid, newPrefs);
   };
 
-  const generateWeeklyPlan = async () => {
+  const generateWeeklyPlan = async (surveyParams?: SurveyParams) => {
     if (!preferences) return;
+    const todayStr = new Date().toISOString().split('T')[0];
+    localStorage.setItem(`survey_date_${user!.uid}`, todayStr);
+
     const plan = await aiService.generateWeeklyPlan(
       user!.uid,
       preferences,
@@ -291,7 +332,8 @@ export default function App() {
       subtopics,
       problems,
       skills,
-      projects
+      projects,
+      surveyParams
     );
 
     const updatedWeekly = [plan, ...weeklyPlans.filter(w => w.weekStartDate !== plan.weekStartDate)];
@@ -563,8 +605,7 @@ export default function App() {
               { id: 'curriculum', path: '/curriculum', label: 'Curriculum', icon: BookOpen },
               { id: 'revision', path: '/revision', label: 'Revision SR', icon: RefreshCw },
               { id: 'interview', path: '/interview', label: 'Interview', icon: Briefcase },
-              { id: 'analytics', path: '/analytics', label: 'Analytics', icon: BarChart3 },
-              { id: 'settings', path: '/settings', label: 'Settings', icon: SettingsIcon }
+              { id: 'analytics', path: '/analytics', label: 'Analytics', icon: BarChart3 }
             ].map(item => {
               const isActive = location.pathname === item.path || (item.path === '/' && location.pathname === '/dashboard');
               const IconComp = item.icon;
@@ -593,22 +634,22 @@ export default function App() {
           <button 
             className="w-full py-3 brutal-btn brutal-btn-accent text-xs flex items-center justify-center gap-1.5" 
             onClick={() => {
-              generateWeeklyPlan();
+              setShowSurveyModal(true);
               setMobileMenuOpen(false);
             }}
           >
             <Zap className="w-4 h-4 shrink-0" />
-            <span>GENERATE AUTOPILOT PLAN</span>
+            <span>STUDY PLAN SURVEY</span>
           </button>
           
           <button 
-            className="w-full py-2.5 brutal-btn text-xs" 
+            className="w-full py-2.5 brutal-btn text-xs bg-bg-surface-alt font-black hover:bg-status-danger hover:text-text-primary" 
             onClick={() => {
               logout();
               setMobileMenuOpen(false);
             }}
           >
-            EXIT PORTAL
+            LOG OUT
           </button>
 
           {/* Dash line divider */}
@@ -650,6 +691,7 @@ export default function App() {
                 problems={problems}
                 skills={skills}
                 insights={aiInsights}
+                openSurveyModal={() => setShowSurveyModal(true)}
               />
             }
           />
@@ -664,6 +706,8 @@ export default function App() {
                 problems={problems}
                 saveProblem={saveProblem}
                 deleteProblem={deleteProblem}
+                notes={notes}
+                saveNote={saveNote}
               />
             }
           />
@@ -706,8 +750,8 @@ export default function App() {
             element={
               <Settings
                 preferences={preferences}
-                savePrefs={savePreferences}
-                triggerReset={triggerReset}
+                savePreferences={savePreferences}
+                reseedMockData={triggerReset}
                 theme={theme}
                 toggleTheme={toggleTheme}
               />
@@ -716,6 +760,14 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
+      <StudyPlanSurveyModal
+        isOpen={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        topics={topics}
+        subtopics={subtopics}
+        onGeneratePlan={generateWeeklyPlan}
+      />
     </div>
   );
 }

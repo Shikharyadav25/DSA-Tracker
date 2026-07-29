@@ -72,12 +72,25 @@ function calculateNextRevision(q, confidence, solvingTime, hintsCount, mistakesC
 // -------------------------------------------------------------
 // 2. Autonomous Scheduler Engine
 // -------------------------------------------------------------
-function generateWeeklyPlanSchedule(userId, preferences, tracks, topics, subtopics, problems, skills, projects) {
+function generateWeeklyPlanSchedule(userId, preferences, tracks, topics, subtopics, problems, skills, projects, surveyParams = null) {
   const activeTracks = preferences?.activeTracks || ['dsa', 'backend', 'projects', 'core_cs'];
-  const intensity = preferences?.intensity || 'balanced';
+  const intensity = surveyParams?.intensity || preferences?.intensity || 'balanced';
   const targetWeeklyHours = preferences?.targetWeeklyHours || 15;
   const studyDays = preferences?.studyDays || [1, 2, 3, 4, 5, 6, 0];
   const collegeWorkload = preferences?.collegeWorkload || 'Low';
+
+  // Topic matching from survey
+  let primaryTopicProblems = [];
+  if (surveyParams?.primaryTopicId) {
+    const targetSubtopicIds = subtopics.filter(s => s.topicId === surveyParams.primaryTopicId).map(s => s.id);
+    primaryTopicProblems = problems.filter(p => targetSubtopicIds.includes(p.subtopicId) && p.status !== 'Solved');
+  }
+
+  let revisionTopicProblems = [];
+  if (surveyParams?.revisionTopicId) {
+    const revSubtopicIds = subtopics.filter(s => s.topicId === surveyParams.revisionTopicId).map(s => s.id);
+    revisionTopicProblems = problems.filter(p => revSubtopicIds.includes(p.subtopicId));
+  }
 
   // Burnout check: adjust study capacity if college workload is high
   let dailyTasksLimit = intensity === 'chill' ? 2 : intensity === 'balanced' ? 3 : 5;
@@ -96,6 +109,8 @@ function generateWeeklyPlanSchedule(userId, preferences, tracks, topics, subtopi
 
   // Helper variables for track counters
   let problemIndex = 0;
+  let topicProblemIndex = 0;
+  let revisionIndex = 0;
   let skillIndex = 0;
   let csIndex = 0;
 
@@ -120,80 +135,90 @@ function generateWeeklyPlanSchedule(userId, preferences, tracks, topics, subtopi
     const tasks = [];
     let focusArea = 'DSA & API Study';
 
-    // Weekend (Friday-Sunday): Sprints focus on Projects & Spaced Revisions
+    // Weekend (Saturday/Sunday/Friday): Sprints focus on Projects & Contests
     const isWeekend = [5, 6, 0].includes(dayOfWeek);
 
     if (isWeekend) {
-      focusArea = 'Projects Sprint & Revision';
+      focusArea = 'Projects Sprint, Contest & Revision';
 
-      // 1. Spaced Repetition (revisions)
-      const dueRevisions = problems
-        .filter(p => p.status === 'Solved' && p.nextReview && p.nextReview <= currentDate.getTime())
-        .slice(0, 2);
-
-      dueRevisions.forEach(p => {
+      // 1. Spaced Repetition or Survey Revision Topic
+      if (revisionTopicProblems.length > 0) {
+        const revP = revisionTopicProblems[revisionIndex % revisionTopicProblems.length];
         tasks.push({
-          id: `task-${p.id}-${dateStr}`,
+          id: `task-${revP.id}-${dateStr}`,
           userId,
           date: dateStr,
           type: 'problem',
-          title: `Revise: ${p.title} (Box ${p.box})`,
-          itemId: p.id,
+          title: `Revise Topic: ${revP.title}`,
+          itemId: revP.id,
           status: 'pending'
         });
-      });
+        revisionIndex++;
+      } else {
+        const dueRevisions = problems
+          .filter(p => p.status === 'Solved' && p.nextReview && p.nextReview <= currentDate.getTime())
+          .slice(0, 2);
 
-      // 2. High-priority Projects Sprints
-      if (activeTracks.includes('projects')) {
-        const activeProjects = projects.filter(p => p.status === 'In Progress');
-        activeProjects.forEach(proj => {
+        dueRevisions.forEach(p => {
           tasks.push({
-            id: `task-${proj.id}-${dateStr}`,
+            id: `task-${p.id}-${dateStr}`,
             userId,
             date: dateStr,
-            type: 'project',
-            title: `Sprint: Build ${proj.name} (${proj.completionPercentage}% complete)`,
-            itemId: proj.id,
+            type: 'problem',
+            title: `Revise: ${p.title} (Box ${p.box})`,
+            itemId: p.id,
             status: 'pending'
           });
         });
       }
 
-      // 3. Resume / Profile tailoring
-      if (activeTracks.includes('resume') && dayOfWeek === 6) {
+      // 2. High-priority Projects Sprints / Development
+      if (activeTracks.includes('projects') || surveyParams?.weekendFocus === 'projects_contests') {
+        const activeProjects = projects.filter(p => p.status === 'In Progress');
+        const targetProj = activeProjects[0] || projects[0];
+        if (targetProj) {
+          tasks.push({
+            id: `task-${targetProj.id}-${dateStr}`,
+            userId,
+            date: dateStr,
+            type: 'project',
+            title: `Sprint: Build ${targetProj.name}`,
+            itemId: targetProj.id,
+            status: 'pending'
+          });
+        }
+      }
+
+      // 3. Weekly Coding Contest
+      if (surveyParams?.includeContests && (dayOfWeek === 6 || dayOfWeek === 0)) {
         tasks.push({
-          id: `task-resume-${dateStr}`,
+          id: `task-contest-${dateStr}`,
           userId,
           date: dateStr,
-          type: 'resume',
-          title: 'Review and refine LinkedIn portfolio / cold emails template',
-          itemId: 'res-portfolio',
+          type: 'problem',
+          title: 'Participate: Weekly LeetCode / Codeforces Contest',
+          itemId: 'contest-weekly',
           status: 'pending'
         });
       }
 
     } else {
-      // Weekdays (Monday-Thursday): Curriculum Syllabus Focus
-      
-      // 1. Core Spaced Revisions (Leitner check)
-      const dueRevisions = problems
-        .filter(p => p.status === 'Solved' && p.nextReview && p.nextReview <= currentDate.getTime())
-        .slice(0, 1);
+      // Weekdays (Monday-Thursday): Primary Curriculum Topic Focus
 
-      dueRevisions.forEach(p => {
+      // 1. Primary Topic Sequential Problem
+      if (primaryTopicProblems.length > 0) {
+        const nextProb = primaryTopicProblems[topicProblemIndex % primaryTopicProblems.length];
         tasks.push({
-          id: `task-${p.id}-${dateStr}`,
+          id: `task-${nextProb.id}-${dateStr}`,
           userId,
           date: dateStr,
           type: 'problem',
-          title: `Revise Spaced Card: ${p.title}`,
-          itemId: p.id,
+          title: `Topic Practice: ${nextProb.title} (${nextProb.difficulty})`,
+          itemId: nextProb.id,
           status: 'pending'
         });
-      });
-
-      // 2. Next Curriculum Problem
-      if (activeTracks.includes('dsa')) {
+        topicProblemIndex++;
+      } else if (activeTracks.includes('dsa')) {
         const unsolved = problems.filter(p => p.status !== 'Solved');
         if (unsolved.length > 0) {
           const nextProb = unsolved[problemIndex % unsolved.length];
@@ -296,7 +321,7 @@ async function queryAIInsights(problems, skills, dailyPlans) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const prompt = `
       You are "Ada", a senior technical architect and software engineering coach.
       Analyze this student tracking data:
@@ -358,7 +383,7 @@ app.post('/api/scheduler/spaced-repetition', (req, res) => {
 
 // Generate complete weekly study plans
 app.post('/api/scheduler/generate-weekly', (req, res) => {
-  const { userId, preferences, tracks, topics, subtopics, problems, skills, projects } = req.body;
+  const { userId, preferences, tracks, topics, subtopics, problems, skills, projects, surveyParams } = req.body;
   if (!userId || !preferences) return res.status(400).json({ error: 'Missing study profiles' });
 
   const weeklyPlan = generateWeeklyPlanSchedule(
@@ -369,7 +394,8 @@ app.post('/api/scheduler/generate-weekly', (req, res) => {
     subtopics || [],
     problems || [],
     skills || [],
-    projects || []
+    projects || [],
+    surveyParams
   );
   res.json(weeklyPlan);
 });
@@ -423,7 +449,6 @@ app.post('/api/coach/chat', async (req, res) => {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const formattedHistory = (chatHistory || []).map(msg => ({
       role: msg.sender === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }]
@@ -437,12 +462,14 @@ app.post('/api/coach/chat', async (req, res) => {
       Guide the student with code tips, design breakdowns, and friendly software development motivation.
     `;
 
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
     const chat = model.startChat({
-      history: formattedHistory,
-      systemInstruction: systemPrompt
+      history: formattedHistory
     });
 
-    const result = await chat.sendMessage(message);
+    const fullPrompt = `${systemPrompt}\n\nUser Message: ${message}`;
+    const result = await chat.sendMessage(fullPrompt);
     res.json({ text: result.response.text() });
   } catch (error) {
     console.error("AI Coach chatbot error:", error);

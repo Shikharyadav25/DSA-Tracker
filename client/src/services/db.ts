@@ -9,6 +9,7 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import * as Types from '../types/learningOS';
+import { seedProblems } from './problems_data';
 
 function getUid(): string {
   return currentUser?.uid || 'guest';
@@ -46,7 +47,6 @@ export function getSeedTracks(): Types.LearningTrack[] {
 
 export function getSeedTopics(): Types.Topic[] {
   return [
-    // DSA Topics
     { id: 'top-arrays-strings', trackId: 'dsa', name: 'Arrays and Strings', order: 1 },
     { id: 'top-linked-list', trackId: 'dsa', name: 'Linked List', order: 2 },
     { id: 'top-stack', trackId: 'dsa', name: 'Stack', order: 3 },
@@ -54,8 +54,9 @@ export function getSeedTopics(): Types.Topic[] {
     { id: 'top-binary-search', trackId: 'dsa', name: 'Binary Search', order: 5 },
     { id: 'top-heap-pattern', trackId: 'dsa', name: 'Heap Pattern', order: 6 },
     { id: 'top-tree-pattern', trackId: 'dsa', name: 'Tree Pattern', order: 7 },
-    { id: 'top-graphs', trackId: 'dsa', name: 'GRAPHS', order: 8 },
-    { id: 'top-dp', trackId: 'dsa', name: 'DP (Dynamic Programming)', order: 9 },
+    { id: 'top-recursion-backtracking', trackId: 'dsa', name: 'Recursion and Backtracking Pattern', order: 8 },
+    { id: 'top-graphs', trackId: 'dsa', name: 'GRAPHS', order: 9 },
+    { id: 'top-dp', trackId: 'dsa', name: 'DP (Dynamic Programming)', order: 10 },
 
     // Backend Topics
     { id: 'top-node', trackId: 'backend', name: 'Node.js & Express Architecture', order: 1 },
@@ -85,6 +86,7 @@ export function getSeedSubtopics(): Types.Subtopic[] {
     { id: 'sub-stack-core', topicId: 'top-stack', name: 'Stack', order: 1, lessonContent: 'LIFO processing for matching parentheses and monotonic stacks.' },
     { id: 'sub-hashmaps-core', topicId: 'top-hash-maps', name: 'Hash Maps', order: 1, lessonContent: 'Fast O(1) frequency lookup and pair matching.' },
     { id: 'sub-bs-core', topicId: 'top-binary-search', name: 'Binary Search', order: 1, lessonContent: 'Halving search space on sorted elements or monotonic conditions.' },
+    { id: 'sub-recursion-core', topicId: 'top-recursion-backtracking', name: 'Recursion & Backtracking', order: 1, lessonContent: 'Basic recursion, backtracking search space exploration, combination, and permutation generation.' },
 
     // Heap Pattern Subtopics
     { id: 'sub-heap-kth', topicId: 'top-heap-pattern', name: '1. Kth', order: 1, lessonContent: 'Kth largest or smallest elements using min/max heaps.' },
@@ -118,274 +120,7 @@ export function getSeedSubtopics(): Types.Subtopic[] {
 }
 
 export function getSeedProblems(): Types.Problem[] {
-  return [
-    {
-      id: 'prob-two-sum',
-      subtopicId: 'sub-arr-two-pointers',
-      title: 'Two Sum II - Input Array Is Sorted',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/',
-      difficulty: 'Medium',
-      pattern: 'Pattern: Two Pointers',
-      status: 'Solved',
-      box: 1,
-      ease: 2.5,
-      interval: 1,
-      nextReview: Date.now() + 1 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 80,
-      estimatedTime: 15,
-      frequency: 95,
-      companyTags: ['Google', 'Meta']
-    },
-    {
-      id: 'prob-max-subarray',
-      subtopicId: 'sub-arr-sliding-window',
-      title: 'Maximum Average Subarray I',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/maximum-average-subarray-i/',
-      difficulty: 'Easy',
-      pattern: 'Pattern: Sliding Window',
-      status: 'New',
-      box: 1,
-      ease: 2.5,
-      interval: 0,
-      nextReview: null,
-      lastSolved: null,
-      masteryScore: 0,
-      estimatedTime: 15,
-      frequency: 85,
-      companyTags: ['Amazon']
-    },
-    {
-      id: 'prob-linked-list-cycle',
-      subtopicId: 'sub-ll-fast-slow',
-      title: 'Linked List Cycle',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/linked-list-cycle/',
-      difficulty: 'Easy',
-      pattern: 'Pattern: Fast & Slow pointers',
-      status: 'Solved',
-      box: 2,
-      ease: 2.6,
-      interval: 3,
-      nextReview: Date.now() + 3 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now() - 1 * 24 * 60 * 60 * 1000,
-      masteryScore: 75,
-      estimatedTime: 10,
-      frequency: 90,
-      companyTags: ['Amazon']
-    },
-    {
-      id: 'prob-max-sub-kadane',
-      subtopicId: 'sub-arr-kadane',
-      title: 'Maximum Subarray',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/maximum-subarray/',
-      difficulty: 'Medium',
-      pattern: 'Pattern: Kadane pattern',
-      status: 'Solved',
-      box: 2,
-      ease: 2.5,
-      interval: 3,
-      nextReview: Date.now() + 3 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 85,
-      estimatedTime: 15,
-      frequency: 95,
-      companyTags: ['Microsoft']
-    },
-    {
-      id: 'prob-range-sum-query',
-      subtopicId: 'sub-arr-prefix-sum',
-      title: 'Range Sum Query - Immutable',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/range-sum-query-immutable/',
-      difficulty: 'Easy',
-      pattern: 'Pattern: Prefix Sum',
-      status: 'New',
-      box: 1,
-      ease: 2.5,
-      interval: 0,
-      nextReview: null,
-      lastSolved: null,
-      masteryScore: 0,
-      estimatedTime: 12,
-      frequency: 80,
-      companyTags: ['Meta']
-    },
-    {
-      id: 'prob-merge-intervals',
-      subtopicId: 'sub-arr-merge-intervals',
-      title: 'Merge Intervals',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/merge-intervals/',
-      difficulty: 'Medium',
-      pattern: 'Pattern: Merge Intervals',
-      status: 'New',
-      box: 1,
-      ease: 2.5,
-      interval: 0,
-      nextReview: null,
-      lastSolved: null,
-      masteryScore: 0,
-      estimatedTime: 20,
-      frequency: 95,
-      companyTags: ['Google']
-    },
-    {
-      id: 'prob-reverse-linked-list',
-      subtopicId: 'sub-ll-in-place-reversal',
-      title: 'Reverse Linked List',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/reverse-linked-list/',
-      difficulty: 'Easy',
-      pattern: 'Pattern: In-place Reversal of a LinkedList',
-      status: 'Solved',
-      box: 3,
-      ease: 2.7,
-      interval: 7,
-      nextReview: Date.now() + 7 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 90,
-      estimatedTime: 10,
-      frequency: 98,
-      companyTags: ['Apple']
-    },
-    {
-      id: 'prob-valid-parentheses',
-      subtopicId: 'sub-stack-core',
-      title: 'Valid Parentheses',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/valid-parentheses/',
-      difficulty: 'Easy',
-      pattern: 'Stack',
-      status: 'Solved',
-      box: 2,
-      ease: 2.6,
-      interval: 3,
-      nextReview: Date.now() + 3 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now() - 1 * 24 * 60 * 60 * 1000,
-      masteryScore: 85,
-      estimatedTime: 12,
-      frequency: 95,
-      companyTags: ['Bloomberg']
-    },
-    {
-      id: 'prob-hashmap-duplicates',
-      subtopicId: 'sub-hashmaps-core',
-      title: 'Contains Duplicate',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/contains-duplicate/',
-      difficulty: 'Easy',
-      pattern: 'Hash Maps',
-      status: 'Solved',
-      box: 1,
-      ease: 2.5,
-      interval: 1,
-      nextReview: Date.now() + 1 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 90,
-      estimatedTime: 10,
-      frequency: 90,
-      companyTags: ['Google']
-    },
-    {
-      id: 'prob-binary-search',
-      subtopicId: 'sub-bs-core',
-      title: 'Binary Search',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/binary-search/',
-      difficulty: 'Easy',
-      pattern: 'Binary Search',
-      status: 'Solved',
-      box: 2,
-      ease: 2.5,
-      interval: 3,
-      nextReview: Date.now() + 3 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 85,
-      estimatedTime: 10,
-      frequency: 95,
-      companyTags: ['Microsoft']
-    },
-    {
-      id: 'prob-kth-largest',
-      subtopicId: 'sub-heap-kth',
-      title: 'Kth Largest Element in an Array',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/kth-largest-element-in-an-array/',
-      difficulty: 'Medium',
-      pattern: 'Heap Pattern: 1. Kth',
-      status: 'New',
-      box: 1,
-      ease: 2.5,
-      interval: 0,
-      nextReview: null,
-      lastSolved: null,
-      masteryScore: 0,
-      estimatedTime: 20,
-      frequency: 90,
-      companyTags: ['Meta']
-    },
-    {
-      id: 'prob-tree-inorder',
-      subtopicId: 'sub-tree-traversal',
-      title: 'Binary Tree Inorder Traversal',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/binary-tree-inorder-traversal/',
-      difficulty: 'Easy',
-      pattern: 'Tree Pattern: 1. Traversal',
-      status: 'Solved',
-      box: 2,
-      ease: 2.5,
-      interval: 3,
-      nextReview: Date.now() + 3 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 80,
-      estimatedTime: 12,
-      frequency: 85,
-      companyTags: ['Microsoft']
-    },
-    {
-      id: 'prob-number-islands',
-      subtopicId: 'sub-graphs-core',
-      title: 'Number of Islands',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/number-of-islands/',
-      difficulty: 'Medium',
-      pattern: 'GRAPHS',
-      status: 'New',
-      box: 1,
-      ease: 2.5,
-      interval: 0,
-      nextReview: null,
-      lastSolved: null,
-      masteryScore: 0,
-      estimatedTime: 25,
-      frequency: 95,
-      companyTags: ['Amazon']
-    },
-    {
-      id: 'prob-climbing-stairs',
-      subtopicId: 'sub-dp-core',
-      title: 'Climbing Stairs',
-      platform: 'LeetCode',
-      link: 'https://leetcode.com/problems/climbing-stairs/',
-      difficulty: 'Easy',
-      pattern: 'DP (Dynamic Programming)',
-      status: 'Solved',
-      box: 1,
-      ease: 2.5,
-      interval: 1,
-      nextReview: Date.now() + 1 * 24 * 60 * 60 * 1000,
-      lastSolved: Date.now(),
-      masteryScore: 80,
-      estimatedTime: 15,
-      frequency: 90,
-      companyTags: ['Uber']
-    }
-  ];
+  return seedProblems;
 }
 
 export function getSeedSkillTracks(): Types.SkillTrack[] {
@@ -427,7 +162,7 @@ export const dbService = {
     if (isGuest()) {
       let local = getLocalTable<T>(name);
       if (name === 'topics') {
-        const hasNewSeeds = local.some((x: any) => x.id === 'top-arrays-strings');
+        const hasNewSeeds = local.some((x: any) => x.id === 'top-recursion-backtracking');
         if (!hasNewSeeds) {
           const freshTopics = getSeedTopics() as any as T[];
           saveLocalTable('topics', freshTopics);
@@ -462,7 +197,7 @@ export const dbService = {
         return defaultSeeds;
       }
       const remoteDocs = snapshot.docs.map(doc => doc.data() as T);
-      if (name === 'topics' && !remoteDocs.some((x: any) => x.id === 'top-arrays-strings')) {
+      if (name === 'topics' && !remoteDocs.some((x: any) => x.id === 'top-recursion-backtracking')) {
         const freshTopics = getSeedTopics();
         await Promise.all(freshTopics.map(t => setDoc(doc(db, 'users', uid, 'topics', t.id), t)));
         await Promise.all(getSeedSubtopics().map(s => setDoc(doc(db, 'users', uid, 'subtopics', s.id), s)));

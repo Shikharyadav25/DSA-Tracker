@@ -1,2 +1,18 @@
-# Local Netlify folder
+# Dependencies
+node_modules
+.pnpm-store
+
+# Environment variables
+.env
+.env.*
+!.env.example
+*.env
+
+# Build outputs
+dist
+build
 .netlify
+
+# OS & System files
+.DS_Store
+*.log
